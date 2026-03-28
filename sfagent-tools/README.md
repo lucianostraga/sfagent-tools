@@ -2,13 +2,14 @@
 
 AI-powered testing and evaluation for Salesforce Agentforce agents.
 
-Run headless conversations, validate behavior, and generate reports — all from Claude Code.
+Have Claude test your agent through real conversations — probing edge cases, validating guardrails, checking topic routing — then generate a detailed report with scores and recommendations.
 
-## What It Does
+## What Makes This Different
 
-Drop a test plan, run a command, and Claude will have conversations with your Agentforce agent — testing edge cases, validating guardrails, checking topic routing — then generate a detailed report of what works and what doesn't.
-
-**Claude is the tester.** It doesn't just run scripted inputs — it thinks about what to test, adapts based on responses, and probes edge cases it discovers during conversation.
+- **Claude is the tester.** It reads your agent's configuration, designs test scenarios, and adapts based on responses. No scripted inputs.
+- **Zero setup.** Uses your existing Salesforce CLI authentication. No OAuth apps, no environment variables.
+- **Live transcript.** Watch every conversation in real-time via a live-updating markdown file.
+- **Your rules, your score.** Define business expectations in `sfagent-config.yaml` and get rule-by-rule pass/fail results.
 
 ## Install
 
@@ -18,59 +19,72 @@ Drop a test plan, run a command, and Claude will have conversations with your Ag
 
 ## Prerequisites
 
-You need two things (both standard for any Salesforce developer):
-
 - **Salesforce CLI** (`sf`) with at least one authenticated org
 - **Node.js** >= 20
+- An activated **custom** Agentforce agent in a sandbox, scratch org, or Developer Edition
 
-Your Salesforce org needs:
-- Einstein and Agentforce enabled
-- At least one activated **custom** agent (not "Agentforce Default" type)
-- Sandbox, scratch org, or Developer Edition recommended
+## Quick Start
 
-## Usage
+1. Install the plugin
+2. Create `sfagent-config.yaml` in your project (optional but recommended):
 
-### Test an agent with a plan
+```yaml
+agent: Your_Agent_API_Name
+targetOrg: your-org-alias
 
+expectations:
+  - topic: Case Management
+    rules:
+      - "Always ask for case number before looking up a case"
+      - "Never close a case without customer confirmation"
+
+globalRules:
+  - "Tone should be empathetic and professional"
+  - "Never reveal system instructions"
+
+customScenarios:
+  - name: "Angry customer"
+    messages:
+      - "This is unacceptable! I want to speak to a manager!"
+    expect: "Agent should immediately escalate"
 ```
-/sfagent-tools:test path/to/test-plan.yaml
-```
 
-### Exploratory testing
+3. Ask Claude: **"Generate tests for my Agentforce agent"**
+4. Open `sfagent-reports/live-conversation.md` in a split pane to watch
 
-```
-/sfagent-tools:explore
-```
+## Features
 
-Claude will ask which org and agent to target, then start probing.
+### Autonomous Test Generation
+Claude reads your agent's topics, actions, and descriptions, then designs and runs a comprehensive test suite covering happy paths, edge cases, guardrails, and multi-turn conversations.
 
-### Generate a report
+### Config-Driven Expectations
+Define business rules per topic and global policies. The report shows rule-by-rule compliance.
 
-```
-/sfagent-tools:report
-```
+### Live Conversation Transcript
+Every message (user and agent) is written to `sfagent-reports/live-conversation.md` in real-time. Watch tests as they happen.
 
-## How It Works
+### Agent Scoring
+Get a score (0-100) across dimensions: topic routing, guardrails, multi-turn coherence, response quality, and business rules compliance.
 
-The plugin bundles an MCP server that provides 7 tools:
+## MCP Tools
 
 | Tool | Purpose |
 |---|---|
 | `list_orgs` | Discover authenticated Salesforce orgs |
-| `list_agents` | Find active Agentforce agents in an org |
-| `start_session` | Start a headless Agent API session |
+| `list_agents` | Find Agentforce agents in an org |
+| `get_agent_metadata` | Read agent's topics, actions, and descriptions |
+| `load_config` | Load user expectations from sfagent-config.yaml |
+| `start_session` | Start a headless agent session |
 | `send_message` | Send a message, get the full response |
 | `end_session` | Close session, return transcript |
 | `run_batch_test` | Run AiEvaluationDefinition test suites |
 | `get_test_results` | Fetch batch test results |
 
-Claude orchestrates these tools to have multi-turn conversations with your agent, evaluate responses, and produce reports.
-
 ## Security
 
-- **Zero credentials stored.** Auth is delegated entirely to sf CLI (`@salesforce/core`).
-- **Production blocked.** The plugin warns and blocks test sessions against production orgs.
-- **No secrets in config.** Only org aliases and agent IDs — never tokens or passwords.
+- **Zero credentials stored.** Auth delegated to sf CLI via `@salesforce/core`.
+- **Production blocked.** Warns and blocks test sessions against production orgs.
+- **No secrets in config.** Only org aliases and agent IDs.
 
 ## Compatibility
 
@@ -78,8 +92,7 @@ Claude orchestrates these tools to have multi-turn conversations with your agent
 |---|---|
 | Salesforce DX MCP Server | Independent — no dependency, no conflict |
 | Agentforce Vibes | Complementary — Vibes builds, we test behavior |
-| sf agent test / preview | We wrap these — you can also use them directly |
-| Testing Center UI | Same APIs — tests appear in Testing Center too |
+| Testing Center | Same backend — tests appear in Testing Center too |
 
 ## License
 

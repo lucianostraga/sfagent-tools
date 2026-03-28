@@ -7,6 +7,7 @@ import { sendMessageSchema, sendMessage } from './tools/messaging.js';
 import { runBatchTestSchema, runBatchTest } from './tools/batch-test.js';
 import { getTestResultsSchema, getTestResults } from './tools/test-results.js';
 import { getAgentMetadataSchema, getAgentMetadata } from './tools/agent-metadata.js';
+import { loadConfigSchema, loadConfig } from './tools/config.js';
 const server = new McpServer({
     name: 'sfagent-tools',
     version: '0.1.0',
@@ -27,6 +28,8 @@ server.tool('run_batch_test', 'Run a predefined Agentforce test suite (AiEvaluat
 server.tool('get_test_results', 'Fetch detailed results of a completed batch test run. Returns pass/fail verdicts for topic routing, action sequences, and response quality.', getTestResultsSchema.shape, async (args) => getTestResults(getTestResultsSchema.parse(args)));
 // Tool: get_agent_metadata
 server.tool('get_agent_metadata', 'Retrieve complete agent configuration: topics (with descriptions), actions per topic, and agent structure. Use this to understand what the agent can do before generating tests.', getAgentMetadataSchema.shape, async (args) => getAgentMetadata(getAgentMetadataSchema.parse(args)));
+// Tool: load_config
+server.tool('load_config', 'Load user expectations from sfagent-config.yaml. Returns topic-specific rules, global rules, and custom test scenarios. If no config file found, returns a sample template. Call this before generating tests to incorporate user expectations.', loadConfigSchema.shape, async (args) => loadConfig(loadConfigSchema.parse(args)));
 // Start the server
 async function main() {
     const transport = new StdioServerTransport();

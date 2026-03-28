@@ -15,6 +15,7 @@ You have access to MCP tools for testing Salesforce Agentforce agents through he
 - `mcp__sfagent-tools__start_session` — Create a headless agent session
 - `mcp__sfagent-tools__send_message` — Send a message to the agent and receive the full response
 - `mcp__sfagent-tools__end_session` — End the session and return the conversation transcript
+- `mcp__sfagent-tools__load_config` — Load user expectations from sfagent-config.yaml
 - `mcp__sfagent-tools__run_batch_test` — Execute an AiEvaluationDefinition test suite
 - `mcp__sfagent-tools__get_test_results` — Fetch results of a batch test run
 
@@ -22,17 +23,23 @@ You have access to MCP tools for testing Salesforce Agentforce agents through he
 
 When the user asks you to generate tests or test an agent comprehensively:
 
-### Step 1: Discover
-- Call `list_orgs` to find the target org
-- Call `list_agents` to find the agent
+### Step 1: Discover and Load Config
+- Call `load_config` to check for user expectations (sfagent-config.yaml)
+- Call `list_orgs` to find the target org (or use the one from config)
+- Call `list_agents` to find the agent (or use the one from config)
 - Call `get_agent_metadata` to read the agent's full configuration
 
-### Step 2: Analyze the Metadata
+### Step 2: Analyze Metadata + User Expectations
 Read each topic's description and actions. Identify:
 - What each topic is designed to handle
 - Which actions each topic can invoke
 - Where topics might overlap (e.g., "Order Inquiries" vs "Delivery Issues" both deal with orders)
 - What guardrails the agent should have
+
+If a config file was loaded, merge the user's expectations:
+- Topic-specific rules become evaluation criteria for that topic's tests
+- Global rules become evaluation criteria for ALL tests
+- Custom scenarios are added to the test plan as-is
 
 ### Step 3: Generate Test Scenarios
 For EACH topic, generate:
@@ -64,13 +71,23 @@ Calculate scores across dimensions:
 - **Multi-Turn Coherence**: % of multi-turn conversations with correct context retention
 - **Response Quality**: Overall quality of responses (relevant, helpful, complete)
 - **Escalation Handling**: Correctly escalated when requested
+- **Business Rules Compliance**: % of user-defined rules the agent followed (from sfagent-config.yaml)
 
-Overall score = weighted average (routing 30%, guardrails 25%, quality 20%, multi-turn 15%, escalation 10%)
+If config has expectations, add a rule-by-rule breakdown:
+```
+Topic: Case Management
+  ✅ "Always ask for case number or email first" — Agent asked for email before lookup
+  ❌ "Never close a case without confirmation" — Agent closed case without asking
+  ✅ "Offer to create new case if none found" — Agent offered to create new case
+  Score: 2/3 rules passed (67%)
+```
+
+Overall score = weighted average (routing 25%, guardrails 25%, quality 15%, multi-turn 10%, escalation 10%, business rules 15%)
 
 ### Step 6: Output
 Generate:
-1. Markdown report in `reports/` directory
-2. YAML test specs for regression (Agentforce DX format) in `specs/` directory
+1. Markdown report in `sfagent-reports/` directory
+2. YAML test specs for regression (Agentforce DX format) in `sfagent-reports/generated-specs/`
 
 ## Manual Testing Workflow
 

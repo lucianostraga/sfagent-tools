@@ -8,6 +8,7 @@ import { sendMessageSchema, sendMessage } from './tools/messaging.js';
 import { runBatchTestSchema, runBatchTest } from './tools/batch-test.js';
 import { getTestResultsSchema, getTestResults } from './tools/test-results.js';
 import { getAgentMetadataSchema, getAgentMetadata } from './tools/agent-metadata.js';
+import { loadConfigSchema, loadConfig } from './tools/config.js';
 
 const server = new McpServer({
   name: 'sfagent-tools',
@@ -76,6 +77,14 @@ server.tool(
   'Retrieve complete agent configuration: topics (with descriptions), actions per topic, and agent structure. Use this to understand what the agent can do before generating tests.',
   getAgentMetadataSchema.shape,
   async (args) => getAgentMetadata(getAgentMetadataSchema.parse(args))
+);
+
+// Tool: load_config
+server.tool(
+  'load_config',
+  'Load user expectations from sfagent-config.yaml. Returns topic-specific rules, global rules, and custom test scenarios. If no config file found, returns a sample template. Call this before generating tests to incorporate user expectations.',
+  loadConfigSchema.shape,
+  async (args) => loadConfig(loadConfigSchema.parse(args))
 );
 
 // Start the server

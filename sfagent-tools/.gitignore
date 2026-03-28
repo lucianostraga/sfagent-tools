@@ -1,0 +1,8 @@
+node_modules/
+.sfdx/
+.sf/
+*.env
+*.key
+credentials.*
+
+# dist/ is intentionally NOT ignored -- committed for plugin distribution

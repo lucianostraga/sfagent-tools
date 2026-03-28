@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s https://docs.anthropic.com/en/docs/claude-code/tutorials)",
+      "Bash(curl -s https://modelcontextprotocol.io/introduction)",
+      "Bash(sf --version)",
+      "Bash(sfdx --version)",
+      "Bash(curl -s https://docs.anthropic.com/en/docs/claude-code/mcp)",
+      "Bash(sf plugins:*)"
+    ],
+    "additionalDirectories": [
+      "/Users/lucianostraga/Documents/workspace/sfagent-tools"
+    ]
+  }
+}

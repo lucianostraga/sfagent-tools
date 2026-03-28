@@ -8,9 +8,9 @@ export const sendMessageSchema = z.object({
 });
 
 export async function sendMessage(args: z.infer<typeof sendMessageSchema>) {
-  const entry = getActiveSession(args.sessionId);
+  const session = getActiveSession(args.sessionId);
 
-  if (!entry) {
+  if (!session) {
     return {
       content: [
         {
@@ -22,9 +22,9 @@ export async function sendMessage(args: z.infer<typeof sendMessageSchema>) {
   }
 
   const { response, session: updatedSession } = await sendAgentMessage(
-    entry.instanceUrl,
-    entry.accessToken,
-    entry.session,
+    session.orgAlias,
+    session.agentId,
+    session,
     args.message
   );
 

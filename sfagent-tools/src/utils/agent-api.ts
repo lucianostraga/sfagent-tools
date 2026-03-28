@@ -1,81 +1,67 @@
-import { randomUUID } from 'node:crypto';
+import { execSync } from 'node:child_process';
 import type { AgentSession, ConversationMessage } from '../types/index.js';
 
-const AGENT_API_BASE = '/einstein/ai-agent/v1';
-
 export async function createSession(
-  instanceUrl: string,
-  accessToken: string,
-  agentId: string
+  targetOrg: string,
+  agentApiName: string
 ): Promise<AgentSession> {
-  const externalSessionKey = randomUUID();
-
-  const response = await fetch(
-    `${instanceUrl}${AGENT_API_BASE}/agents/${agentId}/sessions`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        externalSessionKey,
-        bypassUser: false,
-      }),
-    }
+  const result = execSync(
+    `sf agent preview start --api-name "${agentApiName}" --target-org "${targetOrg}" --json`,
+    { encoding: 'utf-8', timeout: 60000 }
   );
 
-  if (!response.ok) {
-    const errorBody = await response.text();
-    throw new Error(`Failed to create agent session: ${response.status} ${response.statusText} - ${errorBody}`);
+  const parsed = JSON.parse(result) as {
+    status: number;
+    result: { sessionId: string };
+  };
+
+  if (!parsed.result?.sessionId) {
+    throw new Error('No sessionId returned from sf agent preview start');
   }
 
-  const data = (await response.json()) as { sessionId: string };
-
   return {
-    sessionId: data.sessionId,
-    agentId,
-    orgAlias: '',
+    sessionId: parsed.result.sessionId,
+    agentId: agentApiName,
+    orgAlias: targetOrg,
     sequenceId: 0,
     messages: [],
   };
 }
 
 export async function sendMessage(
-  instanceUrl: string,
-  accessToken: string,
+  targetOrg: string,
+  agentApiName: string,
   session: AgentSession,
   messageText: string
 ): Promise<{ response: string; session: AgentSession }> {
   const sequenceId = session.sequenceId + 1;
 
-  // Use the streaming endpoint and consume SSE internally
-  const response = await fetch(
-    `${instanceUrl}${AGENT_API_BASE}/sessions/${session.sessionId}/messages/stream`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-        Accept: 'text/event-stream',
-      },
-      body: JSON.stringify({
-        message: {
-          sequenceId,
-          type: 'Text',
-          text: messageText,
-        },
-      }),
-    }
+  // Escape double quotes and backslashes in the message for the CLI
+  const escapedMessage = messageText.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+
+  const result = execSync(
+    `sf agent preview send --session-id "${session.sessionId}" --api-name "${agentApiName}" --utterance "${escapedMessage}" --target-org "${targetOrg}" --json`,
+    { encoding: 'utf-8', timeout: 120000 }
   );
 
-  if (!response.ok) {
-    const errorBody = await response.text();
-    throw new Error(`Failed to send message: ${response.status} ${response.statusText} - ${errorBody}`);
-  }
+  const parsed = JSON.parse(result) as {
+    status: number;
+    result: {
+      messages: Array<{
+        type: string;
+        message: string;
+        id?: string;
+        feedbackId?: string;
+        isContentSafe?: boolean;
+      }>;
+    };
+  };
 
-  // Parse SSE stream and accumulate the response
-  const agentResponse = await consumeSSEStream(response);
+  const agentMessages = parsed.result?.messages ?? [];
+  const responseText = agentMessages
+    .filter((m) => m.type === 'Inform' && m.message)
+    .map((m) => m.message)
+    .join('\n\n');
 
   const userMessage: ConversationMessage = {
     role: 'user',
@@ -86,7 +72,7 @@ export async function sendMessage(
 
   const agentMessage: ConversationMessage = {
     role: 'agent',
-    content: agentResponse,
+    content: responseText || '(no response from agent)',
     timestamp: new Date().toISOString(),
     sequenceId,
   };
@@ -97,78 +83,19 @@ export async function sendMessage(
     messages: [...session.messages, userMessage, agentMessage],
   };
 
-  return { response: agentResponse, session: updatedSession };
-}
-
-async function consumeSSEStream(response: Response): Promise<string> {
-  const body = response.body;
-  if (!body) {
-    throw new Error('No response body received from streaming endpoint');
-  }
-
-  const reader = body.getReader();
-  const decoder = new TextDecoder();
-  let accumulated = '';
-  let fullResponse = '';
-
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-
-    accumulated += decoder.decode(value, { stream: true });
-
-    // Parse SSE events from accumulated buffer
-    const lines = accumulated.split('\n');
-    accumulated = lines.pop() ?? ''; // Keep incomplete line in buffer
-
-    for (const line of lines) {
-      if (line.startsWith('data:')) {
-        const jsonStr = line.slice(5).trim();
-        if (!jsonStr) continue;
-
-        try {
-          const event = JSON.parse(jsonStr) as {
-            type?: string;
-            text?: string;
-            message?: string;
-          };
-
-          // Accumulate text from TextChunk and Inform events
-          if (event.type === 'TextChunk' && event.text) {
-            fullResponse += event.text;
-          } else if (event.type === 'Inform' && event.message) {
-            // Inform contains the complete message -- use it if we haven't accumulated chunks
-            if (!fullResponse) {
-              fullResponse = event.message;
-            }
-          }
-        } catch {
-          // Skip unparseable lines
-        }
-      }
-    }
-  }
-
-  return fullResponse || '(no response from agent)';
+  return { response: responseText || '(no response from agent)', session: updatedSession };
 }
 
 export async function endSession(
-  instanceUrl: string,
-  accessToken: string,
+  targetOrg: string,
   sessionId: string
 ): Promise<void> {
-  const response = await fetch(
-    `${instanceUrl}${AGENT_API_BASE}/sessions/${sessionId}`,
-    {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    }
-  );
-
-  if (!response.ok && response.status !== 204) {
-    const errorBody = await response.text();
-    throw new Error(`Failed to end session: ${response.status} ${response.statusText} - ${errorBody}`);
+  try {
+    execSync(
+      `sf agent preview end --session-id "${sessionId}" --target-org "${targetOrg}" --json`,
+      { encoding: 'utf-8', timeout: 30000 }
+    );
+  } catch {
+    // Session may have already expired -- that's ok
   }
 }

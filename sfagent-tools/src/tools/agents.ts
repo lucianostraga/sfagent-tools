@@ -22,7 +22,7 @@ export async function listAgents(args: z.infer<typeof listAgentsSchema>) {
 
   // Query for Agentforce agents via the BotDefinition sObject
   const query = encodeURIComponent(
-    "SELECT Id, DeveloperName, MasterLabel, Status FROM BotDefinition WHERE Status = 'Active' ORDER BY MasterLabel"
+    "SELECT Id, DeveloperName, MasterLabel FROM BotDefinition ORDER BY MasterLabel"
   );
 
   const response = await fetch(
@@ -44,7 +44,6 @@ export async function listAgents(args: z.infer<typeof listAgentsSchema>) {
       Id: string;
       DeveloperName: string;
       MasterLabel: string;
-      Status: string;
     }>;
   };
 
@@ -52,7 +51,6 @@ export async function listAgents(args: z.infer<typeof listAgentsSchema>) {
     id: r.Id,
     apiName: r.DeveloperName,
     label: r.MasterLabel,
-    status: r.Status,
   }));
 
   if (agents.length === 0) {

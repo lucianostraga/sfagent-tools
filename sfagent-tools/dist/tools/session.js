@@ -1,11 +1,11 @@
 import { z } from 'zod';
-import { getOrgConnection, isProductionOrg } from '../auth/sf-auth.js';
+import { isProductionOrg } from '../auth/sf-auth.js';
 import { createSession, endSession as endAgentSession } from '../utils/agent-api.js';
 // In-memory session store (sessions are short-lived, per-conversation)
 const activeSessions = new Map();
 export const startSessionSchema = z.object({
     targetOrg: z.string().describe('Org alias or username'),
-    agentId: z.string().describe('18-character Salesforce Agent ID (from list_agents)'),
+    agentApiName: z.string().describe('API name of the agent (from list_agents, e.g. "Agentforce_Service_Agent")'),
 });
 export const endSessionSchema = z.object({
     sessionId: z.string().describe('Session ID returned by start_session'),
@@ -22,17 +22,15 @@ export async function startSession(args) {
             ],
         };
     }
-    const { accessToken, instanceUrl } = await getOrgConnection(args.targetOrg);
-    const session = await createSession(instanceUrl, accessToken, args.agentId);
-    session.orgAlias = args.targetOrg;
-    activeSessions.set(session.sessionId, { session, accessToken, instanceUrl });
+    const session = await createSession(args.targetOrg, args.agentApiName);
+    activeSessions.set(session.sessionId, session);
     return {
         content: [
             {
                 type: 'text',
                 text: JSON.stringify({
                     sessionId: session.sessionId,
-                    agentId: session.agentId,
+                    agentApiName: session.agentId,
                     targetOrg: args.targetOrg,
                     status: 'active',
                     message: 'Session started. Use send_message to converse with the agent.',
@@ -42,8 +40,8 @@ export async function startSession(args) {
     };
 }
 export async function endSession(args) {
-    const entry = activeSessions.get(args.sessionId);
-    if (!entry) {
+    const session = activeSessions.get(args.sessionId);
+    if (!session) {
         return {
             content: [
                 {
@@ -53,13 +51,8 @@ export async function endSession(args) {
             ],
         };
     }
-    try {
-        await endAgentSession(entry.instanceUrl, entry.accessToken, args.sessionId);
-    }
-    catch {
-        // Session may have already expired -- that's ok
-    }
-    const transcript = entry.session.messages;
+    await endAgentSession(session.orgAlias, args.sessionId);
+    const transcript = session.messages;
     activeSessions.delete(args.sessionId);
     return {
         content: [
@@ -80,9 +73,6 @@ export function getActiveSession(sessionId) {
     return activeSessions.get(sessionId);
 }
 export function updateActiveSession(sessionId, session) {
-    const entry = activeSessions.get(sessionId);
-    if (entry) {
-        entry.session = session;
-    }
+    activeSessions.set(sessionId, session);
 }
 //# sourceMappingURL=session.js.map

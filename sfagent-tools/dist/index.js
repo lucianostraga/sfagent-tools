@@ -13,11 +13,11 @@ const server = new McpServer({
 // Tool: list_orgs
 server.tool('list_orgs', 'List all Salesforce orgs authenticated via sf CLI. Shows alias, username, type (sandbox/scratch/production), and connection status.', listOrgsSchema.shape, async () => listOrgs());
 // Tool: list_agents
-server.tool('list_agents', 'List active Agentforce agents in a Salesforce org. Returns agent IDs needed for start_session. Warns if targeting a production org.', listAgentsSchema.shape, async (args) => listAgents(listAgentsSchema.parse(args)));
+server.tool('list_agents', 'List Agentforce agents in a Salesforce org. Returns agent API names needed for start_session. Warns if targeting a production org.', listAgentsSchema.shape, async (args) => listAgents(listAgentsSchema.parse(args)));
 // Tool: start_session
-server.tool('start_session', 'Start a headless conversation session with an Agentforce agent via the Agent API. Returns a sessionId for use with send_message. Blocks production orgs.', startSessionSchema.shape, async (args) => startSession(startSessionSchema.parse(args)));
+server.tool('start_session', 'Start a headless conversation session with an Agentforce agent via sf agent preview. Returns a sessionId for use with send_message. Blocks production orgs. Use the agentApiName from list_agents.', startSessionSchema.shape, async (args) => startSession(startSessionSchema.parse(args)));
 // Tool: send_message
-server.tool('send_message', 'Send a message to an active Agentforce agent session and receive the full response. Internally consumes the SSE stream and returns the complete reply.', sendMessageSchema.shape, async (args) => sendMessage(sendMessageSchema.parse(args)));
+server.tool('send_message', 'Send a message to an active Agentforce agent session and receive the full response. Uses sf agent preview send internally.', sendMessageSchema.shape, async (args) => sendMessage(sendMessageSchema.parse(args)));
 // Tool: end_session
 server.tool('end_session', 'End an active agent session and return the full conversation transcript with all messages exchanged.', endSessionSchema.shape, async (args) => endSession(endSessionSchema.parse(args)));
 // Tool: run_batch_test

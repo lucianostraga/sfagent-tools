@@ -1,13 +1,20 @@
 {
   "orgName": "SFAgent Tools Dev",
   "edition": "Developer",
+  "language": "en_US",
   "features": [
     "EnableSetPasswordInApi",
-    "Einstein1AIPlatform"
+    "Einstein1AIPlatform",
+    "ServiceCloud",
+    "LiveAgent",
+    "Knowledge"
   ],
   "settings": {
     "lightningExperienceSettings": {
       "enableS1DesktopEnabled": true
+    },
+    "languageSettings": {
+      "enableEndUserLanguages": true
     },
     "mobileSettings": {
       "enableS1EncryptedStoragePref2": false
@@ -17,6 +24,15 @@
     },
     "agentPlatformSettings": {
       "enableAgentPlatform": true
+    },
+    "knowledgeSettings": {
+      "enableKnowledge": true
+    },
+    "omniChannelSettings": {
+      "enableOmniChannel": true
+    },
+    "caseSettings": {
+      "systemUserEmail": "admin@sfagent-tools.dev"
     }
   }
 }

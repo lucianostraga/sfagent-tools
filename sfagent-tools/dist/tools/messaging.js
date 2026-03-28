@@ -6,8 +6,8 @@ export const sendMessageSchema = z.object({
     message: z.string().describe('The message to send to the agent'),
 });
 export async function sendMessage(args) {
-    const entry = getActiveSession(args.sessionId);
-    if (!entry) {
+    const session = getActiveSession(args.sessionId);
+    if (!session) {
         return {
             content: [
                 {
@@ -17,7 +17,7 @@ export async function sendMessage(args) {
             ],
         };
     }
-    const { response, session: updatedSession } = await sendAgentMessage(entry.instanceUrl, entry.accessToken, entry.session, args.message);
+    const { response, session: updatedSession } = await sendAgentMessage(session.orgAlias, session.agentId, session, args.message);
     updateActiveSession(args.sessionId, updatedSession);
     return {
         content: [

@@ -2,13 +2,13 @@ import { z } from 'zod';
 import type { AgentSession } from '../types/index.js';
 export declare const startSessionSchema: z.ZodObject<{
     targetOrg: z.ZodString;
-    agentId: z.ZodString;
+    agentApiName: z.ZodString;
 }, "strip", z.ZodTypeAny, {
     targetOrg: string;
-    agentId: string;
+    agentApiName: string;
 }, {
     targetOrg: string;
-    agentId: string;
+    agentApiName: string;
 }>;
 export declare const endSessionSchema: z.ZodObject<{
     sessionId: z.ZodString;
@@ -29,10 +29,6 @@ export declare function endSession(args: z.infer<typeof endSessionSchema>): Prom
         text: string;
     }[];
 }>;
-export declare function getActiveSession(sessionId: string): {
-    session: AgentSession;
-    accessToken: string;
-    instanceUrl: string;
-} | undefined;
+export declare function getActiveSession(sessionId: string): AgentSession | undefined;
 export declare function updateActiveSession(sessionId: string, session: AgentSession): void;
 //# sourceMappingURL=session.d.ts.map

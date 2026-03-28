@@ -24,7 +24,7 @@ server.tool(
 // Tool: list_agents
 server.tool(
   'list_agents',
-  'List active Agentforce agents in a Salesforce org. Returns agent IDs needed for start_session. Warns if targeting a production org.',
+  'List Agentforce agents in a Salesforce org. Returns agent API names needed for start_session. Warns if targeting a production org.',
   listAgentsSchema.shape,
   async (args) => listAgents(listAgentsSchema.parse(args))
 );
@@ -32,7 +32,7 @@ server.tool(
 // Tool: start_session
 server.tool(
   'start_session',
-  'Start a headless conversation session with an Agentforce agent via the Agent API. Returns a sessionId for use with send_message. Blocks production orgs.',
+  'Start a headless conversation session with an Agentforce agent via sf agent preview. Returns a sessionId for use with send_message. Blocks production orgs. Use the agentApiName from list_agents.',
   startSessionSchema.shape,
   async (args) => startSession(startSessionSchema.parse(args))
 );
@@ -40,7 +40,7 @@ server.tool(
 // Tool: send_message
 server.tool(
   'send_message',
-  'Send a message to an active Agentforce agent session and receive the full response. Internally consumes the SSE stream and returns the complete reply.',
+  'Send a message to an active Agentforce agent session and receive the full response. Uses sf agent preview send internally.',
   sendMessageSchema.shape,
   async (args) => sendMessage(sendMessageSchema.parse(args))
 );

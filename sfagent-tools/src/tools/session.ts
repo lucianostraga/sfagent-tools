@@ -1,14 +1,14 @@
 import { z } from 'zod';
-import { getOrgConnection, isProductionOrg } from '../auth/sf-auth.js';
+import { isProductionOrg } from '../auth/sf-auth.js';
 import { createSession, endSession as endAgentSession } from '../utils/agent-api.js';
 import type { AgentSession } from '../types/index.js';
 
 // In-memory session store (sessions are short-lived, per-conversation)
-const activeSessions = new Map<string, { session: AgentSession; accessToken: string; instanceUrl: string }>();
+const activeSessions = new Map<string, AgentSession>();
 
 export const startSessionSchema = z.object({
   targetOrg: z.string().describe('Org alias or username'),
-  agentId: z.string().describe('18-character Salesforce Agent ID (from list_agents)'),
+  agentApiName: z.string().describe('API name of the agent (from list_agents, e.g. "Agentforce_Service_Agent")'),
 });
 
 export const endSessionSchema = z.object({
@@ -28,12 +28,8 @@ export async function startSession(args: z.infer<typeof startSessionSchema>) {
     };
   }
 
-  const { accessToken, instanceUrl } = await getOrgConnection(args.targetOrg);
-
-  const session = await createSession(instanceUrl, accessToken, args.agentId);
-  session.orgAlias = args.targetOrg;
-
-  activeSessions.set(session.sessionId, { session, accessToken, instanceUrl });
+  const session = await createSession(args.targetOrg, args.agentApiName);
+  activeSessions.set(session.sessionId, session);
 
   return {
     content: [
@@ -42,7 +38,7 @@ export async function startSession(args: z.infer<typeof startSessionSchema>) {
         text: JSON.stringify(
           {
             sessionId: session.sessionId,
-            agentId: session.agentId,
+            agentApiName: session.agentId,
             targetOrg: args.targetOrg,
             status: 'active',
             message: 'Session started. Use send_message to converse with the agent.',
@@ -56,9 +52,9 @@ export async function startSession(args: z.infer<typeof startSessionSchema>) {
 }
 
 export async function endSession(args: z.infer<typeof endSessionSchema>) {
-  const entry = activeSessions.get(args.sessionId);
+  const session = activeSessions.get(args.sessionId);
 
-  if (!entry) {
+  if (!session) {
     return {
       content: [
         {
@@ -69,13 +65,9 @@ export async function endSession(args: z.infer<typeof endSessionSchema>) {
     };
   }
 
-  try {
-    await endAgentSession(entry.instanceUrl, entry.accessToken, args.sessionId);
-  } catch {
-    // Session may have already expired -- that's ok
-  }
+  await endAgentSession(session.orgAlias, args.sessionId);
 
-  const transcript = entry.session.messages;
+  const transcript = session.messages;
   activeSessions.delete(args.sessionId);
 
   return {
@@ -103,8 +95,5 @@ export function getActiveSession(sessionId: string) {
 }
 
 export function updateActiveSession(sessionId: string, session: AgentSession) {
-  const entry = activeSessions.get(sessionId);
-  if (entry) {
-    entry.session = session;
-  }
+  activeSessions.set(sessionId, session);
 }

@@ -17,7 +17,7 @@ export async function listAgents(args) {
     }
     const { accessToken, instanceUrl } = await getOrgConnection(args.targetOrg);
     // Query for Agentforce agents via the BotDefinition sObject
-    const query = encodeURIComponent("SELECT Id, DeveloperName, MasterLabel, Status FROM BotDefinition WHERE Status = 'Active' ORDER BY MasterLabel");
+    const query = encodeURIComponent("SELECT Id, DeveloperName, MasterLabel FROM BotDefinition ORDER BY MasterLabel");
     const response = await fetch(`${instanceUrl}/services/data/v63.0/query/?q=${query}`, {
         headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -32,7 +32,6 @@ export async function listAgents(args) {
         id: r.Id,
         apiName: r.DeveloperName,
         label: r.MasterLabel,
-        status: r.Status,
     }));
     if (agents.length === 0) {
         return {

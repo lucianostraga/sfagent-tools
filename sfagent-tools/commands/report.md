@@ -9,4 +9,4 @@ Look for test session data (transcripts, results) in the current project directo
 5. **Recommendations** — Specific agent configuration suggestions
 6. **Generated Test Specs** — YAML test cases for regression testing (Agentforce DX format)
 
-Save the report to the project directory.
+Save the report in the user's current working directory under `sfagent-reports/`. This keeps reports in the user's project, not inside the plugin directory. Create the directory if it doesn't exist.

@@ -33,6 +33,6 @@ Steps:
    - Recommendations for agent improvements
    - YAML test specs for regression (Agentforce DX format)
 
-Save the report as a markdown file in the project's reports/ directory.
+Save the report as a markdown file in the user's current working directory under `sfagent-reports/`. This keeps reports in the user's project, not inside the plugin directory. Create the directory if it doesn't exist.
 
 IMPORTANT: Warn the user if the target org appears to be production. Tests should only run on sandbox/scratch/dev orgs.

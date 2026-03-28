@@ -90,6 +90,20 @@ When the user asks you to test specific scenarios (not auto-generate):
 - **Test multi-turn**: Complex conversations requiring context retention
 - **Test error handling**: Empty messages, very long messages, special characters
 
+## Report Output Location
+
+IMPORTANT: Always save reports and generated YAML specs in the USER'S current working directory under `sfagent-reports/`, NOT inside the plugin directory. This keeps reports with the user's project.
+
+```
+user-project/
+└── sfagent-reports/
+    ├── report-2026-03-28.md          ← Test report
+    └── generated-specs/
+        └── Agent_Name-testSpec.yaml  ← Generated regression specs
+```
+
+Create the `sfagent-reports/` directory if it doesn't exist.
+
 ## Report Format
 
 Generate reports as markdown files with:

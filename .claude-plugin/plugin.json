@@ -1,0 +1,16 @@
+{
+  "name": "sfagent-tools",
+  "version": "0.1.0",
+  "description": "AI-powered testing and evaluation for Salesforce Agentforce agents. Run headless conversations, validate behavior, and generate reports.",
+  "author": "Luciano Straga",
+  "homepage": "https://github.com/lucianostraga/sfagent-tools",
+  "repository": "https://github.com/lucianostraga/sfagent-tools",
+  "license": "Apache-2.0",
+  "keywords": [
+    "salesforce",
+    "agentforce",
+    "testing",
+    "agent-testing",
+    "mcp"
+  ]
+}

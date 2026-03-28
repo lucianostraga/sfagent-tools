@@ -1,5 +1,10 @@
 import { execSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve } from 'node:path';
 import type { AgentSession, ConversationMessage } from '../types/index.js';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const PROJECT_DIR = resolve(__dirname, '../..');
 
 export async function createSession(
   targetOrg: string,
@@ -7,7 +12,7 @@ export async function createSession(
 ): Promise<AgentSession> {
   const result = execSync(
     `sf agent preview start --api-name "${agentApiName}" --target-org "${targetOrg}" --json`,
-    { encoding: 'utf-8', timeout: 60000 }
+    { encoding: 'utf-8', timeout: 60000, cwd: PROJECT_DIR }
   );
 
   const parsed = JSON.parse(result) as {
@@ -43,7 +48,7 @@ export async function sendMessage(
   try {
     result = execSync(
       `sf agent preview send --session-id "${session.sessionId}" --api-name "${agentApiName}" --utterance "${escapedMessage}" --target-org "${targetOrg}" --json`,
-      { encoding: 'utf-8', timeout: 180000 }
+      { encoding: 'utf-8', timeout: 180000, cwd: PROJECT_DIR }
     );
   } catch (err: unknown) {
     const error = err as { status?: number; stdout?: string; message?: string };
@@ -104,7 +109,7 @@ export async function endSession(
   try {
     execSync(
       `sf agent preview end --session-id "${sessionId}" --target-org "${targetOrg}" --json`,
-      { encoding: 'utf-8', timeout: 30000 }
+      { encoding: 'utf-8', timeout: 30000, cwd: PROJECT_DIR }
     );
   } catch {
     // Session may have already expired -- that's ok

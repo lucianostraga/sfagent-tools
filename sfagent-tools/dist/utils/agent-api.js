@@ -1,6 +1,10 @@
 import { execSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve } from 'node:path';
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const PROJECT_DIR = resolve(__dirname, '../..');
 export async function createSession(targetOrg, agentApiName) {
-    const result = execSync(`sf agent preview start --api-name "${agentApiName}" --target-org "${targetOrg}" --json`, { encoding: 'utf-8', timeout: 60000 });
+    const result = execSync(`sf agent preview start --api-name "${agentApiName}" --target-org "${targetOrg}" --json`, { encoding: 'utf-8', timeout: 60000, cwd: PROJECT_DIR });
     const parsed = JSON.parse(result);
     if (!parsed.result?.sessionId) {
         throw new Error('No sessionId returned from sf agent preview start');
@@ -19,7 +23,7 @@ export async function sendMessage(targetOrg, agentApiName, session, messageText)
     const escapedMessage = messageText.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
     let result;
     try {
-        result = execSync(`sf agent preview send --session-id "${session.sessionId}" --api-name "${agentApiName}" --utterance "${escapedMessage}" --target-org "${targetOrg}" --json`, { encoding: 'utf-8', timeout: 180000 });
+        result = execSync(`sf agent preview send --session-id "${session.sessionId}" --api-name "${agentApiName}" --utterance "${escapedMessage}" --target-org "${targetOrg}" --json`, { encoding: 'utf-8', timeout: 180000, cwd: PROJECT_DIR });
     }
     catch (err) {
         const error = err;
@@ -58,7 +62,7 @@ export async function sendMessage(targetOrg, agentApiName, session, messageText)
 }
 export async function endSession(targetOrg, sessionId) {
     try {
-        execSync(`sf agent preview end --session-id "${sessionId}" --target-org "${targetOrg}" --json`, { encoding: 'utf-8', timeout: 30000 });
+        execSync(`sf agent preview end --session-id "${sessionId}" --target-org "${targetOrg}" --json`, { encoding: 'utf-8', timeout: 30000, cwd: PROJECT_DIR });
     }
     catch {
         // Session may have already expired -- that's ok

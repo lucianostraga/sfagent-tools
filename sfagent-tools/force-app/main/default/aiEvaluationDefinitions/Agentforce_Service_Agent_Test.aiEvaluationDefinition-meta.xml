@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AiEvaluationDefinition xmlns="http://soap.sforce.com/2006/04/metadata">
+    <testCase>
+        <expectation>
+            <expectedValue>Case_Management</expectedValue>
+            <name>topic_assertion</name>
+        </expectation>
+        <expectation>
+            <expectedValue>[&apos;Identify_Case&apos;]</expectedValue>
+            <name>actions_assertion</name>
+        </expectation>
+        <expectation>
+            <expectedValue>Agent should attempt to identify the case and provide status or next steps</expectedValue>
+            <name>output_validation</name>
+        </expectation>
+        <inputs>
+            <utterance>I need help with my case about a software license not activating</utterance>
+        </inputs>
+        <number>1</number>
+    </testCase>
+    <testCase>
+        <expectation>
+            <expectedValue>Delivery_Issues</expectedValue>
+            <name>topic_assertion</name>
+        </expectation>
+        <expectation>
+            <expectedValue>[&apos;Check_Delivery_Status&apos;]</expectedValue>
+            <name>actions_assertion</name>
+        </expectation>
+        <expectation>
+            <expectedValue>Agent should acknowledge the delivery delay and attempt to check the order status</expectedValue>
+            <name>output_validation</name>
+        </expectation>
+        <inputs>
+            <utterance>My order hasn&apos;t arrived yet, it was supposed to be here 3 days ago</utterance>
+        </inputs>
+        <number>2</number>
+    </testCase>
+    <testCase>
+        <expectation>
+            <expectedValue>Order_Inquiries</expectedValue>
+            <name>topic_assertion</name>
+        </expectation>
+        <expectation>
+            <expectedValue>[&apos;Get_Order_Details&apos;]</expectedValue>
+            <name>actions_assertion</name>
+        </expectation>
+        <expectation>
+            <expectedValue>Agent should ask for order details and retrieve the order status</expectedValue>
+            <name>output_validation</name>
+        </expectation>
+        <inputs>
+            <utterance>I want to check the status of my recent order</utterance>
+        </inputs>
+        <number>3</number>
+    </testCase>
+    <testCase>
+        <expectation>
+            <expectedValue>Account_Management</expectedValue>
+            <name>topic_assertion</name>
+        </expectation>
+        <expectation>
+            <expectedValue>[&apos;Update_Contact_Info&apos;]</expectedValue>
+            <name>actions_assertion</name>
+        </expectation>
+        <expectation>
+            <expectedValue>Agent should help the customer update their contact information</expectedValue>
+            <name>output_validation</name>
+        </expectation>
+        <inputs>
+            <utterance>I need to change my contact information and email address</utterance>
+        </inputs>
+        <number>4</number>
+    </testCase>
+    <testCase>
+        <expectation>
+            <expectedValue>Reservation_Management</expectedValue>
+            <name>topic_assertion</name>
+        </expectation>
+        <expectation>
+            <expectedValue>[&apos;Create_Reservation&apos;]</expectedValue>
+            <name>actions_assertion</name>
+        </expectation>
+        <expectation>
+            <expectedValue>Agent should help create a new reservation at the requested time</expectedValue>
+            <name>output_validation</name>
+        </expectation>
+        <inputs>
+            <utterance>I want to book a reservation for next Tuesday at 2pm</utterance>
+        </inputs>
+        <number>5</number>
+    </testCase>
+    <testCase>
+        <expectation>
+            <expectedValue>Escalation</expectedValue>
+            <name>topic_assertion</name>
+        </expectation>
+        <expectation>
+            <expectedValue>[&apos;Transfer_To_Agent&apos;]</expectedValue>
+            <name>actions_assertion</name>
+        </expectation>
+        <expectation>
+            <expectedValue>Agent should acknowledge the frustration and escalate to a human agent</expectedValue>
+            <name>output_validation</name>
+        </expectation>
+        <inputs>
+            <utterance>This is unacceptable, I want to speak to a manager right now</utterance>
+        </inputs>
+        <number>6</number>
+    </testCase>
+    <testCase>
+        <expectation>
+            <expectedValue>General_FAQ</expectedValue>
+            <name>topic_assertion</name>
+        </expectation>
+        <expectation>
+            <expectedValue>[&apos;Search_Knowledge&apos;]</expectedValue>
+            <name>actions_assertion</name>
+        </expectation>
+        <expectation>
+            <expectedValue>Agent should search knowledge articles and provide return policy information</expectedValue>
+            <name>output_validation</name>
+        </expectation>
+        <inputs>
+            <utterance>What is your return policy?</utterance>
+        </inputs>
+        <number>7</number>
+    </testCase>
+    <testCase>
+        <expectation>
+            <expectedValue>Case_Management</expectedValue>
+            <name>topic_assertion</name>
+        </expectation>
+        <expectation>
+            <expectedValue>[&apos;Create_Case&apos;]</expectedValue>
+            <name>actions_assertion</name>
+        </expectation>
+        <expectation>
+            <expectedValue>Agent should create a new case for the defective product return</expectedValue>
+            <name>output_validation</name>
+        </expectation>
+        <inputs>
+            <utterance>I received a defective product and want to return it for a refund</utterance>
+        </inputs>
+        <number>8</number>
+    </testCase>
+</AiEvaluationDefinition>

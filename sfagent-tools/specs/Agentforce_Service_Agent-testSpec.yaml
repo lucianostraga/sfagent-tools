@@ -1,0 +1,50 @@
+type: agent
+subjectApiName: Agentforce_Service_Agent
+testCases:
+  - utterance: "I need help with my case about a software license not activating"
+    expectedTopic: "Case_Management"
+    expectedActions:
+      - "Identify_Case"
+    expectedOutcome: "Agent should attempt to identify the case and provide status or next steps"
+
+  - utterance: "My order hasn't arrived yet, it was supposed to be here 3 days ago"
+    expectedTopic: "Delivery_Issues"
+    expectedActions:
+      - "Check_Delivery_Status"
+    expectedOutcome: "Agent should acknowledge the delivery delay and attempt to check the order status"
+
+  - utterance: "I want to check the status of my recent order"
+    expectedTopic: "Order_Inquiries"
+    expectedActions:
+      - "Get_Order_Details"
+    expectedOutcome: "Agent should ask for order details and retrieve the order status"
+
+  - utterance: "I need to change my contact information and email address"
+    expectedTopic: "Account_Management"
+    expectedActions:
+      - "Update_Contact_Info"
+    expectedOutcome: "Agent should help the customer update their contact information"
+
+  - utterance: "I want to book a reservation for next Tuesday at 2pm"
+    expectedTopic: "Reservation_Management"
+    expectedActions:
+      - "Create_Reservation"
+    expectedOutcome: "Agent should help create a new reservation at the requested time"
+
+  - utterance: "This is unacceptable, I want to speak to a manager right now"
+    expectedTopic: "Escalation"
+    expectedActions:
+      - "Transfer_To_Agent"
+    expectedOutcome: "Agent should acknowledge the frustration and escalate to a human agent"
+
+  - utterance: "What is your return policy?"
+    expectedTopic: "General_FAQ"
+    expectedActions:
+      - "Search_Knowledge"
+    expectedOutcome: "Agent should search knowledge articles and provide return policy information"
+
+  - utterance: "I received a defective product and want to return it for a refund"
+    expectedTopic: "Case_Management"
+    expectedActions:
+      - "Create_Case"
+    expectedOutcome: "Agent should create a new case for the defective product return"

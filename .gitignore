@@ -1,0 +1,9 @@
+# User-generated test reports and transcripts
+sfagent-reports/
+
+# Salesforce local config
+.sfdx/
+.sf/
+
+# Claude Code local settings
+.claude/settings.local.json

@@ -7,6 +7,7 @@ import { startSessionSchema, startSession, endSessionSchema, endSession } from '
 import { sendMessageSchema, sendMessage } from './tools/messaging.js';
 import { runBatchTestSchema, runBatchTest } from './tools/batch-test.js';
 import { getTestResultsSchema, getTestResults } from './tools/test-results.js';
+import { getAgentMetadataSchema, getAgentMetadata } from './tools/agent-metadata.js';
 
 const server = new McpServer({
   name: 'sfagent-tools',
@@ -67,6 +68,14 @@ server.tool(
   'Fetch detailed results of a completed batch test run. Returns pass/fail verdicts for topic routing, action sequences, and response quality.',
   getTestResultsSchema.shape,
   async (args) => getTestResults(getTestResultsSchema.parse(args))
+);
+
+// Tool: get_agent_metadata
+server.tool(
+  'get_agent_metadata',
+  'Retrieve complete agent configuration: topics (with descriptions), actions per topic, and agent structure. Use this to understand what the agent can do before generating tests.',
+  getAgentMetadataSchema.shape,
+  async (args) => getAgentMetadata(getAgentMetadataSchema.parse(args))
 );
 
 // Start the server

@@ -6,6 +6,7 @@ import { startSessionSchema, startSession, endSessionSchema, endSession } from '
 import { sendMessageSchema, sendMessage } from './tools/messaging.js';
 import { runBatchTestSchema, runBatchTest } from './tools/batch-test.js';
 import { getTestResultsSchema, getTestResults } from './tools/test-results.js';
+import { getAgentMetadataSchema, getAgentMetadata } from './tools/agent-metadata.js';
 const server = new McpServer({
     name: 'sfagent-tools',
     version: '0.1.0',
@@ -24,6 +25,8 @@ server.tool('end_session', 'End an active agent session and return the full conv
 server.tool('run_batch_test', 'Run a predefined Agentforce test suite (AiEvaluationDefinition) via the sf CLI. Waits for completion and returns the run ID. Blocks production orgs.', runBatchTestSchema.shape, async (args) => runBatchTest(runBatchTestSchema.parse(args)));
 // Tool: get_test_results
 server.tool('get_test_results', 'Fetch detailed results of a completed batch test run. Returns pass/fail verdicts for topic routing, action sequences, and response quality.', getTestResultsSchema.shape, async (args) => getTestResults(getTestResultsSchema.parse(args)));
+// Tool: get_agent_metadata
+server.tool('get_agent_metadata', 'Retrieve complete agent configuration: topics (with descriptions), actions per topic, and agent structure. Use this to understand what the agent can do before generating tests.', getAgentMetadataSchema.shape, async (args) => getAgentMetadata(getAgentMetadataSchema.parse(args)));
 // Start the server
 async function main() {
     const transport = new StdioServerTransport();

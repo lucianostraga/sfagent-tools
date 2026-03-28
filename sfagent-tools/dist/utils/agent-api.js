@@ -17,7 +17,20 @@ export async function sendMessage(targetOrg, agentApiName, session, messageText)
     const sequenceId = session.sequenceId + 1;
     // Escape double quotes and backslashes in the message for the CLI
     const escapedMessage = messageText.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
-    const result = execSync(`sf agent preview send --session-id "${session.sessionId}" --api-name "${agentApiName}" --utterance "${escapedMessage}" --target-org "${targetOrg}" --json`, { encoding: 'utf-8', timeout: 120000 });
+    let result;
+    try {
+        result = execSync(`sf agent preview send --session-id "${session.sessionId}" --api-name "${agentApiName}" --utterance "${escapedMessage}" --target-org "${targetOrg}" --json`, { encoding: 'utf-8', timeout: 180000 });
+    }
+    catch (err) {
+        const error = err;
+        // If we got stdout before timeout, try to use it
+        if (error.stdout) {
+            result = error.stdout;
+        }
+        else {
+            throw new Error(`Agent did not respond within 3 minutes: ${error.message ?? 'timeout'}`);
+        }
+    }
     const parsed = JSON.parse(result);
     const agentMessages = parsed.result?.messages ?? [];
     const responseText = agentMessages

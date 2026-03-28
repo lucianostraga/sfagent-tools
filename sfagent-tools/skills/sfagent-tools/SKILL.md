@@ -115,6 +115,15 @@ Generate reports as markdown files with:
 - Recommendations (specific agent configuration suggestions)
 - Generated YAML test specs for regression
 
+## Live Conversation Transcript
+
+The plugin writes a live-updating markdown file at `sfagent-reports/live-conversation.md` during test runs. Every message (user and agent) is appended in real-time.
+
+When starting a test run, tell the user:
+> "I'm writing a live transcript to `sfagent-reports/live-conversation.md` — open it in a split pane to watch the conversations as they happen."
+
+Use the optional `scenarioName` parameter in `start_session` to label each test scenario in the transcript. Use `scenarioResult` and `scenarioNote` in `end_session` to log pass/fail per scenario.
+
 ## Important Warnings
 
 - **Sandbox only**: Agent tests can modify CRM data and consume Flex Credits. Always confirm the user is targeting a sandbox, scratch org, or Developer Edition — never production.

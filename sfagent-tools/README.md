@@ -4,6 +4,8 @@
 
 Tell Claude what to test. It reads your agent's brain, has dozens of conversations with it, finds what's broken, and gives you a scored report with fix recommendations. No scripts. No YAML. No setup.
 
+https://github.com/lucianostraga/sfagent-tools/raw/main/sfagent-tools-demo.mp4
+
 ```
 "Generate tests for my Agentforce agent"
 ```

@@ -1,3 +1,7 @@
+---
+description: Autonomously generate and run a comprehensive test suite for an Agentforce agent (flagship feature)
+---
+
 Autonomously generate and execute a comprehensive test suite for an Agentforce agent.
 
 This is the flagship feature. Claude reads the agent's configuration AND user expectations, then designs and runs tests without the user writing anything.

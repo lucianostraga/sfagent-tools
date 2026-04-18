@@ -1,3 +1,7 @@
+---
+description: Exploratory testing — Claude probes edge cases, guardrails, and multi-turn scenarios
+---
+
 Start an exploratory testing session with an Agentforce agent.
 
 In exploratory mode, you have open-ended conversations with the agent to discover issues, test edge cases, and validate guardrails. You should:

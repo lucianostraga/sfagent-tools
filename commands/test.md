@@ -1,3 +1,7 @@
+---
+description: Run a test plan (YAML spec or natural language) against an Agentforce agent
+---
+
 Run a test plan against an Agentforce agent.
 
 If a test plan file path is provided as an argument, read it first. If no file is provided, ask the user what they want to test.

@@ -6,7 +6,15 @@
       "Bash(sf --version)",
       "Bash(sfdx --version)",
       "Bash(curl -s https://docs.anthropic.com/en/docs/claude-code/mcp)",
-      "Bash(sf plugins:*)"
+      "Bash(sf plugins:*)",
+      "Bash(ls /Users/lucianostraga/Documents/workspace/*/sfdx-project.json)",
+      "Bash(sf agent:*)",
+      "Bash(echo \"exit: $?\")",
+      "WebSearch",
+      "Bash(sf org:*)",
+      "Bash(say -v ?)",
+      "Bash(say -v \\\\?)",
+      "Bash(claude plugin *)"
     ],
     "additionalDirectories": [
       "/Users/lucianostraga/Documents/workspace/sfagent-tools"

@@ -1,3 +1,7 @@
+---
+description: Generate or regenerate a test report from the most recent test session
+---
+
 Generate or regenerate a test report from the most recent test session.
 
 Look for test session data (transcripts, results) in the current project directory. If found, generate a comprehensive markdown report including:

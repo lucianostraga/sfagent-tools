@@ -1,0 +1,30 @@
+<!DOCTYPE html><html><head><style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#1e1e2e;font-family:'SF Mono','Menlo','Monaco','Courier New',monospace;font-size:15px;line-height:1.5;color:#cdd6f4}
+  #terminal{width:1920px;height:1080px;padding:20px 30px}
+  .tb{background:#313244;border-radius:10px 10px 0 0;padding:10px 16px;display:flex;align-items:center;gap:8px}
+  .d{width:12px;height:12px;border-radius:50%;display:inline-block}
+  .dr{background:#f38ba8}.dy{background:#f9e2af}.dg{background:#a6e3a1}
+  .tt{color:#a6adc8;font-size:13px;margin-left:10px}
+  #ct{background:#11111b;border-radius:0 0 10px 10px;padding:20px 24px;height:980px;overflow:hidden}
+  .ln{margin-bottom:2px;white-space:pre-wrap}
+  .cmd{color:#a6e3a1;font-weight:bold}
+  .cmt{color:#6c7086;font-style:italic}
+  .out{color:#cdd6f4}
+  .pass{color:#a6e3a1;font-weight:bold}
+  .fail{color:#f38ba8;font-weight:bold}
+  .tool{color:#f9e2af}
+  .highlight{color:#89b4fa}
+  .cursor{display:inline-block;width:9px;height:18px;background:#cdd6f4;animation:blink 1s step-end infinite;vertical-align:text-bottom}
+  @keyframes blink{50%{opacity:0}}
+</style></head><body>
+<div id="terminal">
+  <div class="tb"><span class="d dr"></span><span class="d dy"></span><span class="d dg"></span>
+  <span class="tt">sfagent-dev — Claude Code + SFAgent Tools</span></div>
+  <div id="ct"></div>
+</div>
+<script>
+  const ct=document.getElementById('ct');
+  window.addLine=function(t,c){const l=document.createElement('div');l.className='ln '+(c||'');l.innerHTML=t;ct.appendChild(l);ct.scrollTop=ct.scrollHeight};
+  window.clear=function(){ct.innerHTML=''};
+</script></body></html>

@@ -1,0 +1,65 @@
+[
+  {
+    "id": "01-intro",
+    "file": "/Users/lucianostraga/Documents/workspace/agentforce-claude/demo/audio/01-intro.mp3",
+    "duration": 6.576,
+    "pauseAfter": 0.8,
+    "text": "SFAgent Tools — an MCP plugin for Claude Code that tests your Agentforce agents directly from the terminal."
+  },
+  {
+    "id": "02-sf-org",
+    "file": "/Users/lucianostraga/Documents/workspace/agentforce-claude/demo/audio/02-sf-org.mp3",
+    "duration": 8.52,
+    "pauseAfter": 0.6,
+    "text": "Here's the Salesforce org with the Agentforce Service Agent — active, with its API name, description, and role configured."
+  },
+  {
+    "id": "03-connect",
+    "file": "/Users/lucianostraga/Documents/workspace/agentforce-claude/demo/audio/03-connect.mp3",
+    "duration": 8.952,
+    "pauseAfter": 0.5,
+    "text": "From the terminal, we list authenticated orgs and discover agents. The plugin reads your SF CLI credentials — zero extra setup."
+  },
+  {
+    "id": "04-metadata",
+    "file": "/Users/lucianostraga/Documents/workspace/agentforce-claude/demo/audio/04-metadata.mp3",
+    "duration": 10.512,
+    "pauseAfter": 0.5,
+    "text": "Get agent metadata reveals the full structure: eight topics, twenty-seven actions. Case management, delivery issues, escalations — everything mapped out before testing."
+  },
+  {
+    "id": "05-session",
+    "file": "/Users/lucianostraga/Documents/workspace/agentforce-claude/demo/audio/05-session.mp3",
+    "duration": 8.664,
+    "pauseAfter": 0.5,
+    "text": "Start a headless session — the same engine as the Salesforce UI, but from your terminal. Every message is logged to a live markdown transcript."
+  },
+  {
+    "id": "06-testing",
+    "file": "/Users/lucianostraga/Documents/workspace/agentforce-claude/demo/audio/06-testing.mp3",
+    "duration": 9.264,
+    "pauseAfter": 0.5,
+    "text": "Send test messages and get real responses. Identity verification, competitor questions, escalation triggers — tested in seconds, not minutes."
+  },
+  {
+    "id": "07-config",
+    "file": "/Users/lucianostraga/Documents/workspace/agentforce-claude/demo/audio/07-config.mp3",
+    "duration": 11.304,
+    "pauseAfter": 0.5,
+    "text": "Define expectations in a YAML config: topic rules, global rules, and custom scenarios. Run batch tests with AI evaluation definitions for automated pass-fail verdicts."
+  },
+  {
+    "id": "08-results",
+    "file": "/Users/lucianostraga/Documents/workspace/agentforce-claude/demo/audio/08-results.mp3",
+    "duration": 8.184,
+    "pauseAfter": 0.5,
+    "text": "Get clear results: pass-fail per scenario, full transcripts in markdown, and batch test reports — all exportable and repeatable."
+  },
+  {
+    "id": "09-closing",
+    "file": "/Users/lucianostraga/Documents/workspace/agentforce-claude/demo/audio/09-closing.mp3",
+    "duration": 7.464,
+    "pauseAfter": 1.5,
+    "text": "Seven tools. One plugin. SFAgent Tools on the Claude Code marketplace. Automate your Agentforce testing today."
+  }
+]

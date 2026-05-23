@@ -245,7 +245,14 @@ Plugin shows "Published" in submission dashboard but:
 ### Support Conversations
 - First conversation (215473973826344): Bot loop, deflected with self-service suggestions
 - Second conversation (215474059429604): Sent detailed evidence, escalated to human queue
-- Currently: waiting for human agent response (24-72hr typical)
+- No human response received yet
+- Decision: resubmit form to push back into review queue
+
+### Resubmission Attempt
+- Resubmitted via https://claude.ai/settings/plugins/submit with same values
+- Plugin name: SFAgent Tools
+- Description, use cases, platforms, license — all identical to first submission
+- Waiting to see if it goes through this time
 
 ### Verified on Our Side
 - `claude plugin validate .` passes clean (no errors, no warnings)

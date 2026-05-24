@@ -1,0 +1,26 @@
+{
+  "name": "sfagent-tools-marketplace",
+  "description": "AI-powered testing for Salesforce Agentforce agents",
+  "owner": {
+    "name": "Luciano Straga"
+  },
+  "plugins": [
+    {
+      "name": "sfagent-tools",
+      "displayName": "SFAgent Tools",
+      "source": "./",
+      "description": "AI-powered testing for Salesforce Agentforce agents. Claude reads your agent's configuration, designs test scenarios, has real headless conversations, and generates scored reports.",
+      "version": "0.2.0",
+      "author": {
+        "name": "Luciano Straga",
+        "url": "https://github.com/lucianostraga"
+      },
+      "homepage": "https://github.com/lucianostraga/sfagent-tools",
+      "repository": "https://github.com/lucianostraga/sfagent-tools",
+      "license": "Apache-2.0",
+      "keywords": ["salesforce", "agentforce", "testing", "agent-testing", "mcp"],
+      "category": "testing",
+      "tags": ["salesforce", "agentforce", "ai-testing"]
+    }
+  ]
+}

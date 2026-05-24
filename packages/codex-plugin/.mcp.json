@@ -1,0 +1,8 @@
+{
+  "mcp_servers": {
+    "sfagent-tools": {
+      "command": "npx",
+      "args": ["-y", "@sfagent/mcp-server@latest"]
+    }
+  }
+}

@@ -1,0 +1,17 @@
+interface:
+  display_name: "SFAgent Tools"
+  short_description: "Test Agentforce agents via headless multi-turn conversations"
+  icon_small: "./assets/icon-small.svg"
+  icon_large: "./assets/icon-large.png"
+  brand_color: "#00A1E0"
+  default_prompt: "Generate and run a test suite for my Agentforce agent"
+
+policy:
+  allow_implicit_invocation: true
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sfagent-tools"
+      description: "Salesforce Agentforce headless testing MCP server"
+      transport: "stdio"

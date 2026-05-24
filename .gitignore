@@ -7,3 +7,11 @@ sfagent-reports/
 
 # Claude Code local settings
 .claude/settings.local.json
+
+# Node / monorepo build artifacts
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+*.log
+.DS_Store

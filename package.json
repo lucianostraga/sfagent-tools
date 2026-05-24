@@ -1,0 +1,22 @@
+{
+  "name": "sfagent-tools-monorepo",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Monorepo for SFAgent Tools: MCP server + Claude Code plugin + Codex plugin for testing Salesforce Agentforce agents.",
+  "workspaces": [
+    "packages/server"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace sfagent-tools-mcp-server",
+    "dev": "npm run dev --workspace sfagent-tools-mcp-server",
+    "clean": "npm run clean --workspace sfagent-tools-mcp-server"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lucianostraga/sfagent-tools.git"
+  },
+  "license": "Apache-2.0"
+}

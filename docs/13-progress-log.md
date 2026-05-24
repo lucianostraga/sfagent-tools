@@ -342,3 +342,73 @@ cdd1bb9 Rewrite README: comprehensive showcase for marketplace and GitHub
 | Claude plugin marketplaces | https://code.claude.com/docs/en/plugin-marketplaces |
 | Plugin submission form | https://claude.ai/settings/plugins/submit |
 | Official marketplace catalog | https://github.com/anthropics/claude-plugins-official |
+
+---
+
+## Phase 5: v0.2.0 — Monorepo + Codex + TrailheadDX modernization (2026-05-23)
+
+### Why this phase
+Anthropic's curated marketplace hadn't listed the plugin. Decided to: (1) ship a Codex packaging in parallel so distribution isn't single-vendor-dependent, (2) verify nothing in the 2026 Salesforce releases supersedes us or breaks us, (3) fix spec compliance issues that may have blocked the Anthropic community sync.
+
+### Investigations run
+
+Three parallel deep-research passes:
+
+1. **Claude Code plugin spec (current)** — surfaced that there are TWO marketplaces (`claude-plugins-official` curated/no-application vs `claude-community` open-submission), explaining why submitting via the form doesn't land in the official one. Also flagged `owner.url` as undocumented (silently breaks Claude.ai nightly sync) and noted `displayName` (added in v2.1.143) for nicer UI.
+2. **Codex plugin spec** — confirmed the plugin system mirrors Claude Code's (manifests, skills, MCP servers, marketplaces). MCP servers are 100% portable. Codex sandbox is host-level not plugin-level — must document required user `config.toml` entries.
+3. **TrailheadDX 2026 + Spring/Summer '26 release notes** — confirmed no official MCP-based agent-testing tool exists from Salesforce. Three breaking changes flagged: `topic` → `subagent` rename (Apr 15, 2026), `sf agent preview start` flag change (Apr 15), and `sf` CLI token redaction in JSON (May 27). Three new capabilities to adopt: `sf agent trace read/list` (May 20), `sf agent test run-eval` YAML spec (May 20 Beta), `sf agent preview end --all`.
+
+### Verified safe before any changes
+- **Auth path** uses `@salesforce/core` `AuthInfo`/`Org` directly (not CLI output scraping) → unaffected by May 27 deadline ✓
+- **Local + origin git divergence**: discovered local `main` and `origin/main` had **no common ancestor** (separate histories with same branch name). Canonicalized on local, tagged origin as `archive/origin-pre-rewrite-2026-05-23` for safety, force-pushed local.
+- **Anthropic community marketplace JSON**: directly inspected `anthropics/claude-plugins-community/.claude-plugin/marketplace.json` — `sfagent-tools` is NOT listed. Only Agentforce entry is `agentforce-adlc` from Salesforce Research.
+
+### Changes shipped
+
+**Repo restructure**
+- Reorganized into a monorepo (`packages/server`, `packages/claude-code-plugin`, `packages/codex-plugin`)
+- All file moves done with `git mv` so history is preserved
+- Root `package.json` with npm workspaces
+- Server published as `@sfagent/mcp-server` on npm (single source of truth across both plugins)
+
+**Spec compliance fixes (Claude Code)**
+- Added `displayName: "SFAgent Tools"` to `plugin.json`
+- Removed undocumented `owner.url` from `marketplace.json`
+- Moved `metadata.description` to top-level `description`
+- Bumped plugin to v0.2.0
+
+**TrailheadDX-driven code changes**
+- Renamed `topic` → `subagent` everywhere: `TopicRecord` → `SubagentRecord`, `expectedTopic` → `expectedSubagent`, `topicMap` → `subagentMap`, plus tool descriptions
+- Testing API parser accepts both legacy `expectedTopic` AND new `expectedSubagent` fields from the API (backward-compat fallback)
+
+**New MCP tools (3)**
+- `list_traces` — wraps `sf agent trace list` (May 20 CLI feature)
+- `read_trace` — wraps `sf agent trace read`
+- `generate_test_spec` — emits YAML compatible with `sf agent test run-eval`. Turns the plugin into an upstream of the native pipeline (explore here, regress in CI with Salesforce-native tooling).
+
+**Distribution model change**
+- `.mcp.json` switched from bundled `node ${CLAUDE_PLUGIN_ROOT}/dist/index.js` to `npx -y @sfagent/mcp-server@latest`
+- Removed the auto-install `SessionStart` hook (no longer needed since npx handles deps)
+
+**Codex packaging (new)**
+- `.codex-plugin/plugin.json` with full `interface` block (displayName, longDescription, capabilities, defaultPrompt, brandColor, composerIcon, logo)
+- `.mcp.json` (Codex variant with `mcp_servers` top-level key)
+- `skills/sfagent-tools/SKILL.md` (copied from Claude plugin; both use agentskills.io standard)
+- `skills/sfagent-tools/agents/openai.yaml` with `interface`, `policy`, `dependencies.tools` block declaring MCP server dependency
+- `.agents/plugins/marketplace.json` for local/personal distribution
+- `README.md` with install instructions and sandbox configuration requirements
+
+**Documentation**
+- New root `README.md` explaining the monorepo and both install paths
+- Updated `.gitignore` for monorepo build artifacts
+
+### Strategic positioning shift
+
+From "AI testing for Agentforce in Claude Code" to **"Live, exploratory Agentforce testing in Claude Code AND Codex — complements `sf agent test run-eval` by generating the specs it runs."**
+
+TrailheadDX 2026 confirmed Salesforce shipped no MCP-based agent testing tool. Our moat is intact, and the `generate_test_spec` hand-off positions us as a collaborator with the native pipeline rather than a competitor.
+
+### Known follow-ups
+- Drop real icons/screenshots into `packages/codex-plugin/assets/` before official directory submission
+- Submit Codex plugin to OpenAI's Plugin Directory once self-serve publishing opens for non-partners
+- Verify whether re-submitting to the Anthropic community marketplace after the spec fixes successfully syncs to `claude-plugins-community`

@@ -1,0 +1,33 @@
+#!/usr/bin/expect -f
+# Drives a REAL interactive Codex TUI session for demo recording.
+# asciinema captures the full TUI: input box, status, streaming output.
+
+set timeout 180
+set prompt "Test my Agentforce agent: connect to sfagent-dev, list the agents, start a session with Agentforce_Service_Agent, send 'Can you help me with my order?', then end the session and show me the response."
+
+spawn codex --dangerously-bypass-approvals-and-sandbox
+
+# Wait for the TUI to render
+sleep 3
+
+# Type the prompt character-by-character
+set chars [split $prompt ""]
+foreach ch $chars {
+    send -- "$ch"
+    sleep 0.015
+}
+sleep 0.5
+
+# Send
+send -- "\r"
+
+# Let it run
+sleep 90
+
+# Exit: Codex uses Ctrl-C
+send -- "\x03"
+sleep 0.5
+send -- "\x03"
+sleep 1
+
+expect eof

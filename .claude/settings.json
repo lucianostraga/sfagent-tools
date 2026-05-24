@@ -15,7 +15,8 @@
       "Bash(say -v ?)",
       "Bash(say -v \\\\?)",
       "Bash(claude plugin *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "mcp__sfagent-tools__generate_test_spec"
     ],
     "additionalDirectories": [
       "/Users/lucianostraga/Documents/workspace/sfagent-tools"

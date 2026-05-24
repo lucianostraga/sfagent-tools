@@ -24,11 +24,18 @@
 
 ## Install in 30 seconds
 
-**Claude Code:**
+**Claude Code** — inside Claude:
 
-```bash
+```
 /plugin marketplace add lucianostraga/sfagent-tools
 /plugin install sfagent-tools@sfagent-tools-marketplace
+```
+
+Or from your shell, before launching:
+
+```bash
+claude plugin marketplace add lucianostraga/sfagent-tools
+claude plugin install sfagent-tools@sfagent-tools-marketplace
 ```
 
 That's it. Now in any project, just say:
@@ -75,7 +82,13 @@ Production orgs are blocked at the tool level — testing only runs against sand
 
 ## Also works with OpenAI Codex
 
-Add to `~/.codex/config.toml`:
+One command:
+
+```bash
+codex mcp add sfagent-tools -- npx -y sfagent-tools-mcp-server@latest
+```
+
+Or hand-edit `~/.codex/config.toml`:
 
 ```toml
 [mcp_servers.sfagent-tools]
@@ -85,7 +98,7 @@ args = ["-y", "sfagent-tools-mcp-server@latest"]
 
 For the full Codex plugin experience (skills + marketplace metadata), see [packages/codex-plugin/README.md](packages/codex-plugin/README.md).
 
-**Or with any other MCP-compatible client** (Cursor, Continue.dev, Cline, Windsurf, custom agents):
+**Or any other MCP-compatible client** (Cursor, Continue.dev, Cline, Windsurf, custom agents):
 
 ```bash
 npx -y sfagent-tools-mcp-server@latest
@@ -153,7 +166,8 @@ For local Codex testing, see [packages/codex-plugin/README.md](packages/codex-pl
 
 ## Status
 
-- **v0.2.1** — current release. Monorepo, Codex packaging, native trace + spec-generation tools, subagent terminology aligned with Agent Script v2.0.
+- **v1.0.0** — current release. All 12 MCP tools verified end-to-end against a live Agentforce Service Agent in both Claude Code and Codex. Three patch fixes (RequiresProjectError, wrong trace-tool flags, graceful empty-trace fallback) hardened during smoke testing. Production-ready.
+- **v0.2.x** — internal iteration: monorepo restructure, Codex packaging, subagent terminology aligned with Agent Script v2.0, new trace + test-spec tools.
 - **v0.1.0** — initial Claude Code plugin with 9 MCP tools.
 
 ---

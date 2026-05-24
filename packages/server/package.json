@@ -1,6 +1,6 @@
 {
   "name": "sfagent-tools-mcp-server",
-  "version": "0.2.4",
+  "version": "1.0.0",
   "description": "MCP server for testing Salesforce Agentforce agents. Powers the SFAgent Tools plugin for Claude Code and Codex.",
   "type": "module",
   "main": "dist/index.js",

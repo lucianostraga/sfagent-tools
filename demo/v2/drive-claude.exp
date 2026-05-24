@@ -1,0 +1,34 @@
+#!/usr/bin/expect -f
+# Drives a REAL interactive Claude Code TUI session for demo recording.
+# asciinema captures the full TUI: the input box, status bar, streaming output.
+
+set timeout 180
+set prompt "Test my Agentforce agent: connect to sfagent-dev, list the agents, start a session with Agentforce_Service_Agent, send 'Can you help me with my order?', then end the session and show me the response."
+
+# Launch Claude Code with permission bypass so MCP tools auto-approve.
+spawn claude --allow-dangerously-skip-permissions
+
+# Wait for the input box to appear (Claude prints a >  or input prompt char)
+sleep 3
+
+# Type the prompt character-by-character for realistic pacing
+set chars [split $prompt ""]
+foreach ch $chars {
+    send -- "$ch"
+    sleep 0.015
+}
+sleep 0.5
+
+# Send the message
+send -- "\r"
+
+# Let the agent run and respond — give plenty of time for MCP roundtrips
+sleep 90
+
+# Exit Claude cleanly: Ctrl-C then Ctrl-D
+send -- "\x03"
+sleep 0.5
+send -- "\x04"
+sleep 1
+
+expect eof

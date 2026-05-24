@@ -1,6 +1,7 @@
 #!/bin/bash
 # Claude Code demo — runs a real claude --print session against the real
 # sfagent-tools MCP server and renders tool calls + agent response inline.
+# Visual styling mimics the actual Claude Code TUI for authenticity.
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -9,21 +10,22 @@ cd "$(dirname "$SCRIPT_DIR")/.."
 clear
 sleep 0.5
 
-# Title
-echo -e "\033[1;36m▶ SFAgent Tools\033[0m \033[2m— test Agentforce agents from your CLI\033[0m"
+# Claude Code-style banner (matches the real TUI startup)
+printf '\033[38;2;215;119;87m▗\033[48;2;215;119;87m\033[38;2;0;0;0m ▗   ▖ \033[49m\033[38;2;215;119;87m▖\033[0m  \033[1mClaude Code\033[22m  \033[38;2;153;153;153mv2.1.150\033[0m\n'
+printf '  \033[48;2;215;119;87m       \033[0m  \033[38;2;153;153;153mOpus 4.7 (1M context) · Claude Max\033[0m\n'
+printf '  \033[38;2;215;119;87m▘▘ ▝▝\033[0m  \033[38;2;153;153;153m~/work/agentforce-demo\033[0m\n'
+printf '\033[38;2;136;136;136m────────────────────────────────────────────────────────────────────────────\033[0m\n'
 sleep 1.2
-echo ""
-echo -e "\033[2muser:\033[0m"
-sleep 0.3
-PROMPT="Test my Agentforce agent: connect to sfagent-dev, list the agents, start a session with Agentforce_Service_Agent, send 'Can you help me with my order?', then end the session and show me the response."
-# Type the prompt with realistic pacing
+
+# Type the user prompt as if a human is typing
+printf '❯ '
+PROMPT="Test my Agentforce agent in sfagent-dev. List the agents, start a session, send 'Can you help me with my order?', then end the session."
 for (( i=0; i<${#PROMPT}; i++ )); do
   printf "%s" "${PROMPT:$i:1}"
-  sleep 0.012
+  sleep 0.013
 done
 echo ""
-echo ""
-sleep 0.8
+sleep 0.6
 
 # Run Claude and pipe through the stream renderer
 claude --print --verbose --output-format stream-json --allow-dangerously-skip-permissions "$PROMPT" \
@@ -31,7 +33,7 @@ claude --print --verbose --output-format stream-json --allow-dangerously-skip-pe
 
 echo ""
 sleep 1
-echo -e "\033[2m─────────────────────────────────────────\033[0m"
-echo -e "\033[1mReal conversation. Real agent. Real Salesforce.\033[0m"
-echo -e "\033[2mInstall: /plugin marketplace add lucianostraga/sfagent-tools\033[0m"
+printf '\033[38;2;136;136;136m────────────────────────────────────────────────────────────────────────────\033[0m\n'
+printf '\033[1mReal conversation. Real agent. Real Salesforce.\033[0m\n'
+printf '\033[2mInstall:\033[0m  claude plugin install sfagent-tools@sfagent-tools-marketplace\n'
 sleep 2.5

@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPlannerBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Customer service agent that handles case management, delivery issues, order inquiries, account management, reservation management, escalations, general FAQ inquiries, and customer identity verification before any account actions.</description>
+    <localTopicLinks>
+        <genAiPluginName>account_management_support_16jcU000001Vw0j</genAiPluginName>
+    </localTopicLinks>
+    <localTopicLinks>
+        <genAiPluginName>agent_router_16jcU000001Vw0j</genAiPluginName>
+    </localTopicLinks>
+    <localTopicLinks>
+        <genAiPluginName>ambiguous_question_16jcU000001Vw0j</genAiPluginName>
+    </localTopicLinks>
+    <localTopicLinks>
+        <genAiPluginName>case_management_automation_16jcU000001Vw0j</genAiPluginName>
+    </localTopicLinks>
+    <localTopicLinks>
+        <genAiPluginName>delivery_issue_resolution_16jcU000001Vw0j</genAiPluginName>
+    </localTopicLinks>
+    <localTopicLinks>
+        <genAiPluginName>escalation_16jcU000001Vw0j</genAiPluginName>
+    </localTopicLinks>
+    <localTopicLinks>
+        <genAiPluginName>escalation_handling_16jcU000001Vw0j</genAiPluginName>
+    </localTopicLinks>
+    <localTopicLinks>
+        <genAiPluginName>faq_inquiry_responses_16jcU000001Vw0j</genAiPluginName>
+    </localTopicLinks>
+    <localTopicLinks>
+        <genAiPluginName>identity_verification_16jcU000001Vw0j</genAiPluginName>
+    </localTopicLinks>
+    <localTopicLinks>
+        <genAiPluginName>off_topic_16jcU000001Vw0j</genAiPluginName>
+    </localTopicLinks>
+    <localTopicLinks>
+        <genAiPluginName>order_inquiry_assistance_16jcU000001Vw0j</genAiPluginName>
+    </localTopicLinks>
+    <localTopicLinks>
+        <genAiPluginName>reservation_management_16jcU000001Vw0j</genAiPluginName>
+    </localTopicLinks>
+    <localTopics>
+        <fullName>escalation_16jcU000001Vw0j</fullName>
+        <canEscalate>false</canEscalate>
+        <description>Handles requests from users who want to transfer or escalate their conversation to a live human agent.</description>
+        <developerName>escalation_16jcU000001Vw0j</developerName>
+        <genAiPluginInstructions>
+            <description>You are an AI Agent.</description>
+            <developerName>instruction0_179cU000001O1aJ</developerName>
+            <language>en_US</language>
+            <masterLabel>instruction0_179cU000001O1aJ</masterLabel>
+            <sortOrder>1</sortOrder>
+        </genAiPluginInstructions>
+        <language>en_US</language>
+        <localDeveloperName>escalation</localDeveloperName>
+        <masterLabel>Escalation</masterLabel>
+        <pluginType>Topic</pluginType>
+    </localTopics>
+    <localTopics>
+        <fullName>identity_verification_16jcU000001Vw0j</fullName>
+        <canEscalate>false</canEscalate>
+        <description>Verify customer identity before account actions.</description>
+        <developerName>identity_verification_16jcU000001Vw0j</developerName>
+        <genAiPluginInstructions>
+            <description>You are an AI Agent.</description>
+            <developerName>instruction0_179cU000001O1aI</developerName>
+            <language>en_US</language>
+            <masterLabel>instruction0_179cU000001O1aI</masterLabel>
+            <sortOrder>1</sortOrder>
+        </genAiPluginInstructions>
+        <language>en_US</language>
+        <localDeveloperName>identity_verification</localDeveloperName>
+        <masterLabel>Identity Verification</masterLabel>
+        <pluginType>Topic</pluginType>
+    </localTopics>
+    <localTopics>
+        <fullName>order_inquiry_assistance_16jcU000001Vw0j</fullName>
+        <canEscalate>false</canEscalate>
+        <description>Provide information and updates on customer orders.</description>
+        <developerName>order_inquiry_assistance_16jcU000001Vw0j</developerName>
+        <genAiPluginInstructions>
+            <description>You are an AI Agent.</description>
+            <developerName>instruction0_179cU000001O1aL</developerName>
+            <language>en_US</language>
+            <masterLabel>instruction0_179cU000001O1aL</masterLabel>
+            <sortOrder>1</sortOrder>
+        </genAiPluginInstructions>
+        <language>en_US</language>
+        <localDeveloperName>order_inquiry_assistance</localDeveloperName>
+        <masterLabel>Order Inquiry Assistance</masterLabel>
+        <pluginType>Topic</pluginType>
+    </localTopics>
+    <localTopics>
+        <fullName>ambiguous_question_16jcU000001Vw0j</fullName>
+        <canEscalate>false</canEscalate>
+        <description>Redirect conversation to relevant topics when user request is too ambiguous</description>
+        <developerName>ambiguous_question_16jcU000001Vw0j</developerName>
+        <genAiPluginInstructions>
+            <description>You are an AI Agent.</description>
+            <developerName>instruction0_179cU000001O1aK</developerName>
+            <language>en_US</language>
+            <masterLabel>instruction0_179cU000001O1aK</masterLabel>
+            <sortOrder>1</sortOrder>
+        </genAiPluginInstructions>
+        <language>en_US</language>
+        <localDeveloperName>ambiguous_question</localDeveloperName>
+        <masterLabel>Ambiguous Question</masterLabel>
+        <pluginType>Topic</pluginType>
+    </localTopics>
+    <localTopics>
+        <fullName>escalation_handling_16jcU000001Vw0j</fullName>
+        <canEscalate>false</canEscalate>
+        <description>Assist with managing and resolving escalated cases.</description>
+        <developerName>escalation_handling_16jcU000001Vw0j</developerName>
+        <genAiPluginInstructions>
+            <description>You are an AI Agent.</description>
+            <developerName>instruction0_179cU000001O1aN</developerName>
+            <language>en_US</language>
+            <masterLabel>instruction0_179cU000001O1aN</masterLabel>
+            <sortOrder>1</sortOrder>
+        </genAiPluginInstructions>
+        <language>en_US</language>
+        <localDeveloperName>escalation_handling</localDeveloperName>
+        <masterLabel>Escalation Handling</masterLabel>
+        <pluginType>Topic</pluginType>
+    </localTopics>
+    <localTopics>
+        <fullName>delivery_issue_resolution_16jcU000001Vw0j</fullName>
+        <canEscalate>false</canEscalate>
+        <description>Assist with tracking and resolving delivery problems.</description>
+        <developerName>delivery_issue_resolution_16jcU000001Vw0j</developerName>
+        <genAiPluginInstructions>
+            <description>You are an AI Agent.</description>
+            <developerName>instruction0_179cU000001O1aM</developerName>
+            <language>en_US</language>
+            <masterLabel>instruction0_179cU000001O1aM</masterLabel>
+            <sortOrder>1</sortOrder>
+        </genAiPluginInstructions>
+        <language>en_US</language>
+        <localDeveloperName>delivery_issue_resolution</localDeveloperName>
+        <masterLabel>Delivery Issue Resolution</masterLabel>
+        <pluginType>Topic</pluginType>
+    </localTopics>
+    <localTopics>
+        <fullName>agent_router_16jcU000001Vw0j</fullName>
+        <canEscalate>false</canEscalate>
+        <description>Welcome the user and determine the appropriate subagent based on user input</description>
+        <developerName>agent_router_16jcU000001Vw0j</developerName>
+        <genAiPluginInstructions>
+            <description>You are an AI Agent.</description>
+            <developerName>instruction0_179cU000001O1aP</developerName>
+            <language>en_US</language>
+            <masterLabel>instruction0_179cU000001O1aP</masterLabel>
+            <sortOrder>1</sortOrder>
+        </genAiPluginInstructions>
+        <language>en_US</language>
+        <localDeveloperName>agent_router</localDeveloperName>
+        <masterLabel>Agent Router</masterLabel>
+        <pluginType>Topic</pluginType>
+    </localTopics>
+    <localTopics>
+        <fullName>faq_inquiry_responses_16jcU000001Vw0j</fullName>
+        <canEscalate>false</canEscalate>
+        <description>Provide answers to common customer questions.</description>
+        <developerName>faq_inquiry_responses_16jcU000001Vw0j</developerName>
+        <genAiPluginInstructions>
+            <description>You are an AI Agent.</description>
+            <developerName>instruction0_179cU000001O1aO</developerName>
+            <language>en_US</language>
+            <masterLabel>instruction0_179cU000001O1aO</masterLabel>
+            <sortOrder>1</sortOrder>
+        </genAiPluginInstructions>
+        <language>en_US</language>
+        <localDeveloperName>faq_inquiry_responses</localDeveloperName>
+        <masterLabel>FAQ Inquiry Responses</masterLabel>
+        <pluginType>Topic</pluginType>
+    </localTopics>
+    <localTopics>
+        <fullName>off_topic_16jcU000001Vw0j</fullName>
+        <canEscalate>false</canEscalate>
+        <description>Redirect conversation to relevant topics when user request goes off-topic</description>
+        <developerName>off_topic_16jcU000001Vw0j</developerName>
+        <genAiPluginInstructions>
+            <description>You are an AI Agent.</description>
+            <developerName>instruction0_179cU000001O1aR</developerName>
+            <language>en_US</language>
+            <masterLabel>instruction0_179cU000001O1aR</masterLabel>
+            <sortOrder>1</sortOrder>
+        </genAiPluginInstructions>
+        <language>en_US</language>
+        <localDeveloperName>off_topic</localDeveloperName>
+        <masterLabel>Off Topic</masterLabel>
+        <pluginType>Topic</pluginType>
+    </localTopics>
+    <localTopics>
+        <fullName>reservation_management_16jcU000001Vw0j</fullName>
+        <canEscalate>false</canEscalate>
+        <description>Manage bookings and resolve reservation-related issues.</description>
+        <developerName>reservation_management_16jcU000001Vw0j</developerName>
+        <genAiPluginInstructions>
+            <description>You are an AI Agent.</description>
+            <developerName>instruction0_179cU000001O1aQ</developerName>
+            <language>en_US</language>
+            <masterLabel>instruction0_179cU000001O1aQ</masterLabel>
+            <sortOrder>1</sortOrder>
+        </genAiPluginInstructions>
+        <language>en_US</language>
+        <localDeveloperName>reservation_management</localDeveloperName>
+        <masterLabel>Reservation Management</masterLabel>
+        <pluginType>Topic</pluginType>
+    </localTopics>
+    <localTopics>
+        <fullName>case_management_automation_16jcU000001Vw0j</fullName>
+        <canEscalate>false</canEscalate>
+        <description>Streamline case handling and resolution processes.</description>
+        <developerName>case_management_automation_16jcU000001Vw0j</developerName>
+        <genAiPluginInstructions>
+            <description>You are an AI Agent.</description>
+            <developerName>instruction0_179cU000001O1aS</developerName>
+            <language>en_US</language>
+            <masterLabel>instruction0_179cU000001O1aS</masterLabel>
+            <sortOrder>1</sortOrder>
+        </genAiPluginInstructions>
+        <language>en_US</language>
+        <localDeveloperName>case_management_automation</localDeveloperName>
+        <masterLabel>Case Management Automation</masterLabel>
+        <pluginType>Topic</pluginType>
+    </localTopics>
+    <localTopics>
+        <fullName>account_management_support_16jcU000001Vw0j</fullName>
+        <canEscalate>false</canEscalate>
+        <description>Handle updates and changes to customer accounts.</description>
+        <developerName>account_management_support_16jcU000001Vw0j</developerName>
+        <genAiPluginInstructions>
+            <description>You are an AI Agent.</description>
+            <developerName>instruction0_179cU000001O1aH</developerName>
+            <language>en_US</language>
+            <masterLabel>instruction0_179cU000001O1aH</masterLabel>
+            <sortOrder>1</sortOrder>
+        </genAiPluginInstructions>
+        <language>en_US</language>
+        <localDeveloperName>account_management_support</localDeveloperName>
+        <masterLabel>Account Management Support</masterLabel>
+        <pluginType>Topic</pluginType>
+    </localTopics>
+    <masterLabel>Service Agent</masterLabel>
+    <plannerType>Atlas__ConcurrentMultiAgentOrchestration</plannerType>
+</GenAiPlannerBundle>

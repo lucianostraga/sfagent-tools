@@ -4,7 +4,9 @@
 
 Tell Claude what to test. It reads your agent's brain, has dozens of conversations with it, finds what's broken, and gives you a scored report with fix recommendations. No scripts. No YAML. No setup.
 
-https://github.com/user-attachments/assets/8bf1fb01-6f6b-4916-9149-b1fbbba8c707
+![Claude Code demo](../../demo/sfagent-claude-demo.gif)
+
+*Real terminal recording. No mocks, no edits.*
 
 ```
 "Generate tests for my Agentforce agent"

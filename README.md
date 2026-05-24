@@ -8,7 +8,17 @@
 [![Works in Claude Code](https://img.shields.io/badge/Claude_Code-supported-D97757.svg)](https://code.claude.com)
 [![Works in OpenAI Codex](https://img.shields.io/badge/OpenAI_Codex-supported-10A37F.svg)](https://developers.openai.com/codex)
 
-https://github.com/user-attachments/assets/8bf1fb01-6f6b-4916-9149-b1fbbba8c707
+### Demo — same plugin, both AI assistants
+
+**Claude Code:**
+
+![Claude Code demo](demo/sfagent-claude-demo.gif)
+
+**OpenAI Codex:**
+
+![OpenAI Codex demo](demo/sfagent-codex-demo.gif)
+
+*Both clips are real terminal recordings. No mocks, no edits.* Same prompt, same MCP server, same Salesforce sandbox.
 
 ---
 

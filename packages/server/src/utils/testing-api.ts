@@ -1,4 +1,5 @@
 import { execSync } from 'node:child_process';
+import { getSfProjectDir } from './sf-project.js';
 import type { BatchTestRun, TestResult } from '../types/index.js';
 
 export async function runBatchTest(
@@ -8,7 +9,7 @@ export async function runBatchTest(
   try {
     const result = execSync(
       `sf agent test run --api-name "${testApiName}" --target-org "${targetOrg}" --wait 10 --result-format json --json`,
-      { encoding: 'utf-8', timeout: 600000 }
+      { encoding: 'utf-8', timeout: 600000, cwd: getSfProjectDir() }
     );
 
     const parsed = JSON.parse(result) as {
@@ -41,7 +42,7 @@ export async function getTestResults(
   try {
     const result = execSync(
       `sf agent test results --job-id "${jobId}" --target-org "${targetOrg}" --result-format json --json`,
-      { encoding: 'utf-8', timeout: 120000 }
+      { encoding: 'utf-8', timeout: 120000, cwd: getSfProjectDir() }
     );
 
     const parsed = JSON.parse(result) as {
@@ -93,7 +94,7 @@ export async function listTests(targetOrg: string): Promise<string[]> {
   try {
     const result = execSync(
       `sf agent test list --target-org "${targetOrg}" --json`,
-      { encoding: 'utf-8', timeout: 30000 }
+      { encoding: 'utf-8', timeout: 30000, cwd: getSfProjectDir() }
     );
 
     const parsed = JSON.parse(result) as {

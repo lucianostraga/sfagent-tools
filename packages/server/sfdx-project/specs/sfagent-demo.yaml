@@ -1,0 +1,28 @@
+agentType: customer
+companyName: SFAgent Tools Demo
+companyDescription: A demo company for the SFAgent Tools MCP plugin showing
+  automated Agentforce testing.
+role: Customer service agent that handles case management, delivery issues,
+  order inquiries, account management, reservation management, escalations,
+  general FAQ inquiries, and customer identity verification before any account
+  actions.
+maxNumOfTopics: 8
+enrichLogs: false
+tone: casual
+topics:
+  - name: Case Management Automation
+    description: Streamline case handling and resolution processes.
+  - name: Delivery Issue Resolution
+    description: Assist with tracking and resolving delivery problems.
+  - name: Order Inquiry Assistance
+    description: Provide information and updates on customer orders.
+  - name: Account Management Support
+    description: Handle updates and changes to customer accounts.
+  - name: Reservation Management
+    description: Manage bookings and resolve reservation-related issues.
+  - name: Escalation Handling
+    description: Assist with managing and resolving escalated cases.
+  - name: FAQ Inquiry Responses
+    description: Provide answers to common customer questions.
+  - name: Identity Verification
+    description: Verify customer identity before account actions.

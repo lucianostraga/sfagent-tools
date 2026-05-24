@@ -91,9 +91,10 @@ server.tool(
 );
 
 // Tool: list_traces (Salesforce CLI 2026-05-20+)
+// Note: traces are LOCAL files captured by sf agent preview; no --target-org.
 server.tool(
   'list_traces',
-  'List Salesforce-generated trace files for past agent preview sessions. Each session auto-records actions, subagent navigation, and tool calls. Use this to find a trace before calling read_trace.',
+  'List local trace files for past agent preview sessions. Each session auto-records actions, subagent routing, and tool calls into the SFDX project. Use this to find a trace before calling read_trace. Only sessions started by this MCP server are listed.',
   listTracesSchema.shape,
   async (args) => listTraces(listTracesSchema.parse(args))
 );
@@ -101,7 +102,7 @@ server.tool(
 // Tool: read_trace (Salesforce CLI 2026-05-20+)
 server.tool(
   'read_trace',
-  'Read the detailed trace for a specific agent preview session. Returns step-by-step actions, subagent routing decisions, and tool invocations. Great for diagnosing why a test failed.',
+  'Read the detailed trace for a specific agent preview session. Returns step-by-step actions, subagent routing decisions, and tool invocations. Great for diagnosing why a test failed. Pass format=detail and a dimension (actions/grounding/routing/errors) to drill in.',
   readTraceSchema.shape,
   async (args) => readTrace(readTraceSchema.parse(args))
 );

@@ -8,17 +8,43 @@
 [![Works in Claude Code](https://img.shields.io/badge/Claude_Code-supported-D97757.svg)](https://code.claude.com)
 [![Works in OpenAI Codex](https://img.shields.io/badge/OpenAI_Codex-supported-10A37F.svg)](https://developers.openai.com/codex)
 
-### Demo — same plugin, both AI assistants
+### Demo
 
-**Claude Code:**
+The full sanity-check workflow — one prompt, the AI runs the full test suite, returns findings:
 
 ![Claude Code demo](demo/sfagent-claude-demo.gif)
 
-**OpenAI Codex:**
+Same plugin, same agent, same answer — also works in OpenAI Codex:
 
 ![OpenAI Codex demo](demo/sfagent-codex-demo.gif)
 
-*Both clips are real terminal recordings. No mocks, no edits.* Same prompt, same MCP server, same Salesforce sandbox.
+*Real terminal recordings against a live Salesforce sandbox + Agentforce Service Agent.*
+
+---
+
+### Every tool, in 10 seconds each
+
+| Discover | |
+|---|---|
+| **list_orgs** — find your authenticated Salesforce orgs | ![](demo/clips/sfagent-list_orgs.gif) |
+| **list_agents** — list Agentforce agents in an org | ![](demo/clips/sfagent-list_agents.gif) |
+| **get_agent_metadata** — see subagents + actions | ![](demo/clips/sfagent-get_agent_metadata.gif) |
+| **load_config** — read your `sfagent-config.yaml` expectations | ![](demo/clips/sfagent-load_config.gif) |
+
+| Run a live test | |
+|---|---|
+| **start_session** — open a headless conversation | ![](demo/clips/sfagent-start_session.gif) |
+| **send_message** — send a probe, get the agent's reply | ![](demo/clips/sfagent-send_message.gif) |
+| **end_session** — close and return the transcript | ![](demo/clips/sfagent-end_session.gif) |
+
+| Hand off to CI | |
+|---|---|
+| **generate_test_spec** — emit YAML for `sf agent test run-eval` | ![](demo/clips/sfagent-generate_test_spec.gif) |
+
+| Diagnose with Salesforce's own traces *(sf CLI 2026-05-20+)* | |
+|---|---|
+| **list_traces** — find local trace files | ![](demo/clips/sfagent-list_traces.gif) |
+| **read_trace** — drill into actions + routing per turn | ![](demo/clips/sfagent-read_trace.gif) |
 
 ---
 

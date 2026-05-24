@@ -1,6 +1,8 @@
 #!/bin/bash
-# Claude Code demo — runs a real claude --print session and renders output
-# IDENTICAL to the actual Claude Code interactive TUI format.
+# Claude Code demo — REPLAYS pre-captured Claude output through the paced
+# renderer. Same authentic stream-json content (recorded once via real
+# `claude --print` against the real MCP server) but with controlled timing
+# so the resulting video lets viewers read at human pace.
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -19,26 +21,23 @@ printf "${PINK} ▐▛███▜▌${RESET}   ${BOLD}Claude Code${RESET} ${DIM
 printf "${PINK}▝▜█████▛▘${RESET}  ${DIM}Opus 4.7 (1M context) · Claude Max${RESET}\n"
 printf "${PINK}  ▘▘ ▝▝  ${RESET}  ${DIM}~/Documents/workspace/agentforce-claude${RESET}\n"
 echo ""
-sleep 1.3
+sleep 1.6
 
-# User prompt (short, realistic)
+# User prompt
 printf '❯ '
 PROMPT="test the agent in sfagent-dev — quick smoke test, real conversation"
 for (( i=0; i<${#PROMPT}; i++ )); do
   printf "%s" "${PROMPT:$i:1}"
-  sleep 0.022
+  sleep 0.025
 done
 echo ""
 echo ""
-sleep 0.5
+sleep 0.9
 
-# Run Claude with a focused prompt that produces visible value
-FULL_PROMPT="Run a quick smoke test on the Agentforce agent in org sfagent-dev using sfagent-tools. Use exactly this flow, all on one session: start_session, send 'Can you help me with my order?', send 'My email is sarah.johnson@acme.com', send 'I want to speak to a manager now', generate_test_spec with suiteName 'smoke-test', end_session. Then in ONE short paragraph, tell me: which scenarios passed, which failed, and where the regression spec was saved. Be concise — this is a demo."
+# Replay the pre-captured real Claude output through the paced renderer
+cat "$SCRIPT_DIR/captured/claude-stream.jsonl" | node "$SCRIPT_DIR/render-claude-stream.js"
 
-claude --print --verbose --output-format stream-json --allow-dangerously-skip-permissions "$FULL_PROMPT" \
-  | node "$SCRIPT_DIR/render-claude-stream.js"
-
-sleep 1
+sleep 1.2
 printf "${DIM}────────────────────────────────────────────────────────────────────────────${RESET}\n"
 printf "${BOLD}One sentence. Real conversation. Real findings. Ready for CI.${RESET}\n"
 printf "${DIM}Install:${RESET}  claude plugin install sfagent-tools@sfagent-tools-marketplace\n"

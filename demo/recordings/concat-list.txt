@@ -1,3 +1,0 @@
-file '/Users/lucianostraga/Documents/workspace/agentforce-claude/demo/recordings/part-title.mp4'
-file '/Users/lucianostraga/Documents/workspace/agentforce-claude/demo/recordings/sf-norm.mp4'
-file '/Users/lucianostraga/Documents/workspace/agentforce-claude/demo/recordings/part-terminal.mp4'

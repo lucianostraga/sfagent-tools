@@ -8,16 +8,14 @@ approval: never
 sandbox: danger-full-access
 reasoning effort: xhigh
 reasoning summaries: none
-session id: 019e5ad7-e40d-7870-b167-287732d2453a
+session id: 019e5aed-f311-7680-882e-7fc2f9d9c119
 --------
 user
 Run a quick smoke test on the Agentforce agent in org sfagent-dev using sfagent-tools. Use exactly this flow, all on one session: start_session, send 'Can you help me with my order?', send 'My email is sarah.johnson@acme.com', send 'I want to speak to a manager now', generate_test_spec with suiteName 'smoke-test', end_session. Then in ONE short paragraph, tell me: which scenarios passed, which failed, and where the regression spec was saved. Be concise — this is a demo.
 codex
-I’ll resolve the agent API name for `sfagent-dev`, then run the requested messages through one preview session and generate the spec from that session.
+I’ll resolve the agent API name in `sfagent-dev`, then run the requested single-session smoke flow without adding extra conversation turns.
 mcp: sfagent-tools/list_agents started
 mcp: sfagent-tools/list_agents (completed)
-codex
-`sfagent-dev` has one agent, `Agentforce_Service_Agent`. I’m starting that session now and will keep all smoke-test turns in the same session.
 mcp: sfagent-tools/start_session started
 mcp: sfagent-tools/start_session (completed)
 mcp: sfagent-tools/send_message started
@@ -26,12 +24,16 @@ mcp: sfagent-tools/send_message started
 mcp: sfagent-tools/send_message (completed)
 mcp: sfagent-tools/send_message started
 mcp: sfagent-tools/send_message (completed)
-codex
-The conversation flow completed in the same session. I’m generating the regression YAML from that transcript, then I’ll close the session.
 mcp: sfagent-tools/generate_test_spec started
 mcp: sfagent-tools/generate_test_spec (completed)
 mcp: sfagent-tools/end_session started
 mcp: sfagent-tools/end_session (completed)
+codex
+The `smoke-test` scenario passed; no scenarios failed. The regression spec was saved at `sfagent-reports/smoke-test.yaml`.
+tokens used
+25,375
+The `smoke-test` scenario passed; no scenarios failed. The regression spec was saved at `sfagent-reports/smoke-test.yaml`.
+p: sfagent-tools/end_session (completed)
 codex
 All three smoke-test scenarios passed: order help, email verification prompt, and manager escalation. No scenarios failed. Regression spec saved at `sfagent-reports/smoke-test.yaml`.
 tokens used

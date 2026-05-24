@@ -412,3 +412,100 @@ TrailheadDX 2026 confirmed Salesforce shipped no MCP-based agent testing tool. O
 - Drop real icons/screenshots into `packages/codex-plugin/assets/` before official directory submission
 - Submit Codex plugin to OpenAI's Plugin Directory once self-serve publishing opens for non-partners
 - Verify whether re-submitting to the Anthropic community marketplace after the spec fixes successfully syncs to `claude-plugins-community`
+
+---
+
+## Phase 6: v1.0.0 — end-to-end verification, real CLI demos, marketplace-ready (2026-05-24)
+
+### Why this phase
+v0.2.x had spec compliance + Codex packaging on paper but had never been smoke-tested against a real Agentforce agent end-to-end. The prior demo video was hardcoded HTML mocks, not real CLI output. Goal of the day: stand up a real test environment, exercise every tool, fix what breaks, and replace the demo with authentic terminal recordings.
+
+### Scratch org saga (longer than expected — UI walls)
+
+1. **Original scratch org expired.** Recreated `sfagent-dev` from `devhubLuciano` with the recovered scratch def. Bumped duration to 30 days (was 7).
+2. **First Salesforce wall:** "User doesn't have access to use agent" when trying to create an Agentforce Service Agent via `sf agent create --spec`. Initial scratch def was missing required features.
+3. **Updated scratch def** to include `ServiceCloud`, `LiveAgent`, `Knowledge` (in addition to `Einstein1AIPlatform`) — these are the features the original demo had but had been lost.
+4. **Permission set licenses + permsets** required for Agentforce agent creation:
+   - PSLs: `EinsteinGPTCopilotPsl`, `AgentforceServiceAgentBuilderPsl`, `AgentPlatformBuilderPsl`, `EinsteinGPTPromptTemplatesPsl`
+   - Permsets: `AgentPlatformBuilder`, `AgentforceServiceAgentBuilder`, `EinsteinGPTPromptTemplateManager`, `CopilotSalesforceAdmin`, `CopilotSalesforceUser`
+   - The missing one that unblocked it: **`CopilotSalesforceAdmin`** (Agentforce Default Admin) — not in the original setup docs.
+5. **PSL license exhaustion:** Each failed `sf agent create` attempt consumed `EinsteinGPTPromptTemplatesPsl` slots (only 3 per scratch org) by creating orphan `EinsteinServiceAgent User` users. Wrote Apex to delete orphan PSLAs + deactivate orphan users to free licenses.
+6. **`BotDefinition.BotUserId` is read-only via API.** Even after `sf agent publish authoring-bundle` succeeded and created the agent metadata, activation required a Bot User assignment that can ONLY be set in the Agent Builder UI. Confirmed by Apex compile error: `Field is not writeable: BotDefinition.BotUserId`.
+7. **Final solution:** user created the agent manually through the Setup wizard. The wizard handles the BotUser creation and assignment internally. Agent created with 8 subagents matching the original demo (Case Management, Delivery Issues, Order Inquiries, Account Management, Reservation Management, Escalation, General FAQ, Service Customer Verification).
+8. **Language fix:** scratch org admin defaulted to Spanish (`LanguageLocaleKey: es`, `LocaleSidKey: es_AR`) so all CLI errors were untranslated. Apex `update User` to `en_US` upfront for future setups.
+
+### Smoke testing all 12 MCP tools — bugs found
+
+Tested every tool end-to-end against the live agent. Three real bugs surfaced that would have shipped broken to users:
+
+| Bug | Symptom | Fix | Patch |
+|---|---|---|---|
+| `sf agent preview` commands need an SFDX project dir on cwd | `RequiresProjectError` on `start_session`, `send_message`, `end_session`, `read_trace` | New `utils/sf-project.ts` helper materializes a minimal `sfdx-project.json` in `os.tmpdir()/sfagent-tools-mcp-sfdx/` and uses it as cwd for every `sf agent` call | **0.2.2** |
+| `sf agent trace list/read` use `--agent` (not `--api-name`) and don't take `--target-org` | "Nonexistent flag: --target-org" — completely wrong flags | Rewrote `tools/trace.ts` with correct flags. Traces are LOCAL files in the SFDX project, not fetched from the org. | **0.2.3** |
+| `sf agent trace read` throws `TraceParseError` on empty `{}` trace files (when agent didn't invoke actions) | `read_trace` returned a cryptic error for any session that just hit verification gates | `read_trace` now falls back to reading the trace JSON files directly from disk when the CLI parser dies, with a friendly explanation that the agent didn't invoke any actions | **0.2.4** |
+
+After three patches, **all 10 critical tools verified working** (skipped `run_batch_test` + `get_test_results` since they need a pre-existing `AiEvaluationDefinition`). Cross-client verified: identical agent responses in both Claude Code and Codex.
+
+### v1.0.0 ship
+
+Bumped all five version-tracked manifests (root `package.json`, server `package.json`, both plugin `plugin.json`s, marketplace.json) to `1.0.0`. Published `sfagent-tools-mcp-server@1.0.0` to npm. Cut `v1.0.0` GitHub release with full notes — replaced the stale `Apr 8 Demo Video` release tag that had been the "Latest" badge in the sidebar.
+
+### npm publishing learnings
+- npm requires 2FA on publish by default. Hardware security key flow via `npm login` (WebAuthn browser flow) works; CLI `--otp` flag doesn't (security keys don't generate codes).
+- Granular access tokens with "Bypass 2FA for publishing" enabled also work for non-interactive CI.
+
+### Real CLI demo videos (many iterations)
+
+The original demo was Playwright + edge-tts that rendered hardcoded HTML mockups looking like a terminal. Decided to replace with real terminal recordings using `asciinema` + `agg`.
+
+Eight visible iterations landing on the current shape:
+- **v1–v3**: tried multiple chapter-based formats, banner styles, prompt structures. User: *"that's not how anyone actually uses the plugin."*
+- **v4**: switched to one realistic user prompt ("test the agent in sfagent-dev"). User: *"I REALLY LIKE IT!"*
+- **v5–v6**: tried to match real Claude Code TUI format exactly (the 3-line `▐▛███▜▌` ASCII logo, `Called sfagent-tools N times (ctrl+o to expand)` collapsed style). Hit problems where the logo rendered like a pig at GIF zoom.
+- **v7**: per-tool individual rendering. User: *"big chunk of text no one could understand, a disaster."*
+- **v8 final**: **10 short per-tool clips** (~8–10s each), organized in the README as a grid by purpose (Discover / Run a live test / Hand off to CI / Diagnose). Each clip is a real `claude --print` capture replayed through a paced renderer. Plus one main "sanity check" demo for the hero. User: *"FANTASTIC! THIS IS WHAT I NEEDED."*
+
+**Crucial technical insight:** `claude --print` produces stream-json output in a single burst after thinking for 30–70s. `asciinema` then sees a silent gap followed by a flurry of output, producing unreadable videos. Fix: **pre-capture** the real Claude output to a JSON file once, then have the demo script **replay** it through a paced renderer. The content stays 100% authentic (it's real Claude output captured against the real MCP server), only the timing is human-controlled.
+
+Final pipeline at `demo/v3/` (per-tool clips) and `demo/v2/` (main demo). `build-clips.sh` regenerates all 10 clips from scratch.
+
+### README restructure (sales-pitch lead)
+
+Rewrote in the order the user wanted for marketplace discovery:
+1. **Hero**: *"The first AI-driven testing toolkit for Salesforce Agentforce — in Claude Code AND OpenAI Codex."*
+2. **What it does** (9 benefit bullets with emoji markers — scannable in 10 seconds)
+3. **See it work** (main demo + Codex parity)
+4. **Install in 30 seconds** (Claude + Codex side by side, both first-class)
+5. **Every tool, in 10 seconds each** (10 per-tool clip grid)
+6. Why this exists / How it works / Zero setup / Built on TrailblazerDX 2026 / etc.
+
+Also surfaced terminology clarification (*subagent (formerly topic)*) at the first mention in every section, so readers landing anywhere on the page get the context.
+
+Reframed `list_orgs` description to *"pick which org to test your agent in (production blocked)"* to differentiate from Salesforce DX MCP's generic org listing.
+
+### Cleanup
+Removed the entire v0.1 Playwright + edge-tts demo pipeline (~103 MB local, ~70 MB committed): `demo/audio/`, `demo/recordings/`, the old `narration.js` + `record-*.js` scripts, `node_modules`, `.venv`, and the original 2.1 MB `sfagent-tools-demo.mp4`. **752 files changed, 171,715 deletions.** The new pipelines at `demo/v2/` + `demo/v3/` are tiny by comparison.
+
+### Files added that signal a healthy repo
+- `CLAUDE.md` + `AGENTS.md` at repo root — cross-tool entry points (Claude Code reads CLAUDE.md, Codex reads AGENTS.md). Each has conventions, gotchas, useful commands.
+- `demo/clips/sfagent-{tool}.gif` × 10 — the per-tool mini clips
+- `packages/server/src/utils/sf-project.ts` — the SFDX-project-dir helper
+
+### End-of-day shape
+
+- npm: `sfagent-tools-mcp-server@1.0.0` (live, downloadable, install-tested)
+- GitHub: `v1.0.0` tag + release (badge in sidebar shows "1.0.0 · today")
+- README: hero pitch → 9-bullet capabilities → main demo → install → 10-clip grid → context
+- All 5 version slots aligned at 1.0.0
+- Agentforce Service Agent active in sfagent-dev (30-day scratch)
+- 0 known bugs in the published server
+- 0 megabytes of dead pipeline
+
+### Lessons learned
+
+1. **Trust but verify** — v0.2.x looked "done" on paper, but real smoke testing surfaced 3 bugs in 30 minutes. Spec compliance is necessary but not sufficient.
+2. **Salesforce scratch org Agentforce setup is genuinely hard** — even with the right scratch def features, the BotUserId is API-locked and forces a UI step. Document this for plugin users.
+3. **`asciinema` + replay-from-capture > recording real interactive sessions** — interactive `claude` driven by `expect` had PTY issues; pre-capturing the stream-json and replaying with paced rendering gave us authentic content with controlled timing.
+4. **Production-style narrated demos beat realistic ones for marketplace pitches** — but user prompts WITHIN those demos have to be realistic ("test my agent") not artificial ("walk me through every tool").
+5. **Per-tool clips solved the "wall of text" problem** — 10 short focused clips read better than one long demo, even if the total content is similar.
+6. **Tool descriptions that overlap with other MCP servers need disambiguating language** — `list_orgs` overlaps with Salesforce DX MCP, so we reframed to signal our testing context.

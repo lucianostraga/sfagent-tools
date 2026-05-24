@@ -1,6 +1,6 @@
 {
   "name": "sfagent-tools",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "AI-powered testing and evaluation for Salesforce Agentforce agents. Run headless conversations, validate behavior, and generate reports.",
   "author": {
     "name": "Luciano Straga",

@@ -7,8 +7,10 @@
     {
       "name": "sfagent-tools",
       "source": {
-        "source": "local",
-        "path": "../../"
+        "source": "git-subdir",
+        "url": "https://github.com/lucianostraga/sfagent-tools.git",
+        "path": "./packages/codex-plugin",
+        "ref": "main"
       },
       "policy": {
         "installation": "AVAILABLE"

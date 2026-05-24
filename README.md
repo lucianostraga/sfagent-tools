@@ -11,6 +11,20 @@
 
 ---
 
+## What it does
+
+- 🔍 **Discovers your agent** — reads every subagent, action, and description from your org so the AI knows what to test before testing it.
+- 💬 **Has real conversations** — drives headless multi-turn sessions through `sf agent preview`. Live transcript in markdown you can watch in a split pane.
+- 🛡️ **Probes guardrails** — prompt-injection attempts, off-topic requests, legal threats, manager-escalation triggers, identity-verification gates — automatically.
+- 📏 **Validates your business rules** — load expectations from `sfagent-config.yaml` (topic-specific rules, global rules, custom scenarios) and the AI scores each one.
+- 📊 **Scores everything** — routing accuracy, guardrail strength, multi-turn coherence, business-rule compliance — in a clean Markdown report.
+- 🔁 **Hands off to CI** — emits YAML compatible with `sf agent test run-eval` so the same scenarios run on every commit.
+- 🩺 **Reads Salesforce's own traces** — `sf agent trace` shows exactly which subagent routed each turn and which actions ran. We surface it for diagnostics.
+- 🔐 **Zero new credentials** — reuses your `sf` CLI auth. No External Client App, no connected app, no tokens. Production orgs are blocked at the tool level.
+- 🤖 **Works in Claude Code AND OpenAI Codex** — same npm-published MCP server. Also works in Cursor, Continue.dev, Cline, Windsurf, or any MCP client.
+
+---
+
 ## See it work
 
 One sentence. Real agent. Real findings. Ready for CI.

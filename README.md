@@ -13,6 +13,8 @@
 
 ## What it does
 
+> 📝 **Terminology:** *subagent* is Salesforce's renamed term for what was called *topic* before Agent Script v2.0 (April 2026). Same thing, new name — used throughout this README and the plugin.
+
 - 🔍 **Discovers your agent** — reads every subagent, action, and description from your org so the AI knows what to test before testing it.
 - 💬 **Has real conversations** — drives headless multi-turn sessions through `sf agent preview`. Live transcript in markdown you can watch in a split pane.
 - 🛡️ **Probes guardrails** — prompt-injection attempts, off-topic requests, legal threats, manager-escalation triggers, identity-verification gates — automatically.
@@ -79,9 +81,9 @@ Each clip is a real terminal recording. Real Salesforce sandbox. Real Agentforce
 
 | | |
 |---|---|
-| **list_orgs** — find your authenticated Salesforce orgs | ![](demo/clips/sfagent-list_orgs.gif) |
+| **list_orgs** — pick which org to test your agent in (production blocked) | ![](demo/clips/sfagent-list_orgs.gif) |
 | **list_agents** — list Agentforce agents in an org | ![](demo/clips/sfagent-list_agents.gif) |
-| **get_agent_metadata** — see subagents + actions | ![](demo/clips/sfagent-get_agent_metadata.gif) |
+| **get_agent_metadata** — see subagents (formerly *topics*) + actions | ![](demo/clips/sfagent-get_agent_metadata.gif) |
 | **load_config** — read your `sfagent-config.yaml` expectations | ![](demo/clips/sfagent-load_config.gif) |
 
 ### Run a live test

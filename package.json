@@ -7,9 +7,9 @@
     "packages/server"
   ],
   "scripts": {
-    "build": "npm run build --workspace @sfagent/mcp-server",
-    "dev": "npm run dev --workspace @sfagent/mcp-server",
-    "clean": "npm run clean --workspace @sfagent/mcp-server"
+    "build": "npm run build --workspace sfagent-tools-mcp-server",
+    "dev": "npm run dev --workspace sfagent-tools-mcp-server",
+    "clean": "npm run clean --workspace sfagent-tools-mcp-server"
   },
   "engines": {
     "node": ">=20.0.0"

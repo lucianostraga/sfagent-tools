@@ -1,5 +1,5 @@
 {
-  "name": "@sfagent/mcp-server",
+  "name": "sfagent-tools-mcp-server",
   "version": "0.2.0",
   "description": "MCP server for testing Salesforce Agentforce agents. Powers the SFAgent Tools plugin for Claude Code and Codex.",
   "type": "module",
@@ -40,9 +40,6 @@
   "homepage": "https://github.com/lucianostraga/sfagent-tools#readme",
   "bugs": {
     "url": "https://github.com/lucianostraga/sfagent-tools/issues"
-  },
-  "publishConfig": {
-    "access": "public"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",

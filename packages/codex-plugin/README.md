@@ -2,7 +2,7 @@
 
 AI-powered testing for Salesforce Agentforce agents inside [OpenAI Codex](https://developers.openai.com/codex). Tell Codex what to test, and it reads your agent's configuration, runs headless conversations, and produces a scored report plus a YAML spec you can run with `sf agent test run-eval`.
 
-This is the Codex packaging of [`sfagent-tools`](https://github.com/lucianostraga/sfagent-tools). The Claude Code packaging lives in `../claude-code-plugin/`. Both share the same MCP server: [`@sfagent/mcp-server`](https://www.npmjs.com/package/@sfagent/mcp-server).
+This is the Codex packaging of [`sfagent-tools`](https://github.com/lucianostraga/sfagent-tools). The Claude Code packaging lives in `../claude-code-plugin/`. Both share the same MCP server: [`sfagent-tools-mcp-server`](https://www.npmjs.com/package/sfagent-tools-mcp-server).
 
 ## Prerequisites
 
@@ -31,7 +31,7 @@ If you only want the MCP server (without the skills layer), add this to `~/.code
 ```toml
 [mcp_servers.sfagent-tools]
 command = "npx"
-args = ["-y", "@sfagent/mcp-server@latest"]
+args = ["-y", "sfagent-tools-mcp-server@latest"]
 ```
 
 Then in Codex, type any of these to get started:
@@ -79,7 +79,7 @@ Same surface as the Claude Code plugin:
 - Skills include an `agents/openai.yaml` sidecar for Codex-specific UI metadata and implicit-invocation policy
 - Distribution is via marketplace JSON files at `.agents/plugins/marketplace.json` (vs Claude's `.claude-plugin/marketplace.json`)
 
-The MCP server (`@sfagent/mcp-server`) is identical across both.
+The MCP server (`sfagent-tools-mcp-server`) is identical across both.
 
 ## License
 

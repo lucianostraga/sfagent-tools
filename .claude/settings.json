@@ -14,7 +14,8 @@
       "Bash(sf org:*)",
       "Bash(say -v ?)",
       "Bash(say -v \\\\?)",
-      "Bash(claude plugin *)"
+      "Bash(claude plugin *)",
+      "Bash(git add *)"
     ],
     "additionalDirectories": [
       "/Users/lucianostraga/Documents/workspace/sfagent-tools"

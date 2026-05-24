@@ -7,7 +7,7 @@ Tell your AI assistant what to test. It reads your agent's brain, has dozens of 
 No scripts. No YAML to write by hand. No new credentials — reuses your `sf` CLI authentication.
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![npm](https://img.shields.io/npm/v/@sfagent/mcp-server.svg)](https://www.npmjs.com/package/@sfagent/mcp-server)
+[![npm](https://img.shields.io/npm/v/sfagent-tools-mcp-server.svg)](https://www.npmjs.com/package/sfagent-tools-mcp-server)
 
 ## Repository layout
 
@@ -16,7 +16,7 @@ This is a monorepo. The MCP server is the actual product — both plugin packagi
 ```
 sfagent-tools/
 ├── packages/
-│   ├── server/                # @sfagent/mcp-server — the MCP server (TypeScript)
+│   ├── server/                # sfagent-tools-mcp-server — the MCP server (TypeScript)
 │   ├── claude-code-plugin/    # Anthropic Claude Code packaging
 │   └── codex-plugin/          # OpenAI Codex packaging
 ├── docs/                      # progress logs, architecture decisions
@@ -41,7 +41,7 @@ Add this to `~/.codex/config.toml`:
 ```toml
 [mcp_servers.sfagent-tools]
 command = "npx"
-args = ["-y", "@sfagent/mcp-server@latest"]
+args = ["-y", "sfagent-tools-mcp-server@latest"]
 ```
 
 Or install the full Codex plugin (skills + marketplace metadata) — see [packages/codex-plugin/README.md](packages/codex-plugin/README.md).
@@ -49,7 +49,7 @@ Or install the full Codex plugin (skills + marketplace metadata) — see [packag
 ### Direct MCP (any MCP-compatible client)
 
 ```bash
-npx -y @sfagent/mcp-server@latest
+npx -y sfagent-tools-mcp-server@latest
 ```
 
 ## What's inside the MCP server

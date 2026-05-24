@@ -1,6 +1,6 @@
 # SFAgent Tools
 
-> **The first AI-driven testing toolkit for Salesforce Agentforce — in Claude Code AND OpenAI Codex.**
+> **The first AI-driven testing toolkit for Salesforce Agentforce — in Claude Code, OpenAI Codex, and Agentforce Vibes.**
 >
 > Tell your AI assistant what to test. It reads your agent's brain, runs real headless conversations, finds what's broken, and hands you a scored report plus a YAML spec for CI. **In minutes, not hours. Zero new credentials.**
 
@@ -8,6 +8,7 @@
 [![npm](https://img.shields.io/npm/v/sfagent-tools-mcp-server.svg)](https://www.npmjs.com/package/sfagent-tools-mcp-server)
 [![Works in Claude Code](https://img.shields.io/badge/Claude_Code-supported-D97757.svg)](https://code.claude.com)
 [![Works in OpenAI Codex](https://img.shields.io/badge/OpenAI_Codex-supported-10A37F.svg)](https://developers.openai.com/codex)
+[![Works in Agentforce Vibes](https://img.shields.io/badge/Agentforce_Vibes-supported-00A1E0.svg)](https://developer.salesforce.com/docs/platform/einstein-for-devs/guide/devagent-mcp.html)
 
 ---
 
@@ -23,7 +24,7 @@
 - 🔁 **Hands off to CI** — emits YAML compatible with `sf agent test run-eval` so the same scenarios run on every commit.
 - 🩺 **Reads Salesforce's own traces** — `sf agent trace` shows exactly which subagent routed each turn and which actions ran. We surface it for diagnostics.
 - 🔐 **Zero new credentials** — reuses your `sf` CLI auth. No External Client App, no connected app, no tokens. Production orgs are blocked at the tool level.
-- 🤖 **Works in Claude Code AND OpenAI Codex** — same npm-published MCP server. Cursor, Continue.dev, Cline, Windsurf packagings coming soon.
+- 🤖 **Works in Claude Code, OpenAI Codex, and Agentforce Vibes** — same npm-published MCP server. Cursor, Continue.dev, Cline, Windsurf packagings coming soon.
 
 ---
 
@@ -65,7 +66,22 @@ One command:
 codex mcp add sfagent-tools -- npx -y sfagent-tools-mcp-server@latest
 ```
 
-That's it for either. Now in any project, just say:
+### Agentforce Vibes
+
+Inside Vibes (IDE or VS Code extension), open the **MCP Tools** panel → **Configure MCP Servers** → add to `a4d_mcp_settings.json`:
+
+```json
+{
+  "mcpServers": {
+    "sfagent-tools": {
+      "command": "npx",
+      "args": ["-y", "sfagent-tools-mcp-server@latest"]
+    }
+  }
+}
+```
+
+That's it for any of them. Now in any project, just say:
 
 > *"Test my Agentforce agent"*
 
@@ -161,7 +177,7 @@ The MCP server itself is generic — anything that speaks the Model Context Prot
 npx -y sfagent-tools-mcp-server@latest
 ```
 
-**Currently officially supported and tested:** Claude Code, OpenAI Codex.
+**Currently officially supported and tested:** Claude Code, OpenAI Codex, Agentforce Vibes.
 
 **Coming soon (packaged + tested):** Cursor, Continue.dev, Cline, Windsurf, Gemini CLI.
 

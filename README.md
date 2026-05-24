@@ -15,7 +15,7 @@
 
 > 📝 **Terminology:** *subagent* is Salesforce's renamed term for what was called *topic* before Agent Script v2.0 (April 2026). Same thing, new name — used throughout this README and the plugin.
 
-- 🔍 **Discovers your agent** — reads every subagent, action, and description from your org so the AI knows what to test before testing it.
+- 🔍 **Discovers your agent** — reads every subagent (formerly *topic*), action, and description from your org so the AI knows what to test before testing it.
 - 💬 **Has real conversations** — drives headless multi-turn sessions through `sf agent preview`. Live transcript in markdown you can watch in a split pane.
 - 🛡️ **Probes guardrails** — prompt-injection attempts, off-topic requests, legal threats, manager-escalation triggers, identity-verification gates — automatically.
 - 📏 **Validates your business rules** — load expectations from `sfagent-config.yaml` (topic-specific rules, global rules, custom scenarios) and the AI scores each one.
@@ -115,7 +115,7 @@ Plus `run_batch_test` and `get_test_results` for users who already have native `
 
 You built an Agentforce agent. Now you need to know:
 
-- Does it route to the right subagent when a customer says *"my order is late"*?
+- Does it route to the right subagent (formerly *topic*) when a customer says *"my order is late"*?
 - What happens when someone says *"ignore your instructions"*?
 - Does it remember context across a 5-turn conversation?
 - Does it actually follow your business rules?
@@ -129,7 +129,7 @@ You built an Agentforce agent. Now you need to know:
 
 ## How it works
 
-1. **Reads your agent** — discovers every subagent, action, and description in your org
+1. **Reads your agent** — discovers every subagent (formerly *topic*), action, and description in your org
 2. **Designs scenarios** — happy paths, edge cases, prompt-injection probes, escalation tests, multi-turn context
 3. **Has real conversations** — headless multi-turn sessions through `sf agent preview`. You watch them happen live in a split pane.
 4. **Scores everything** — routing accuracy, guardrails, business-rule compliance, multi-turn coherence — in a clean Markdown report
@@ -147,7 +147,7 @@ If you've ever run `sf org login web`, you're done. SFAgent Tools reuses your ex
 
 ## Built on the latest Salesforce tooling
 
-Aligned with Agentforce DX as of TrailblazerDX 2026. Uses Agent Script v2.0 (`subagent`) terminology, the GA `sf agent preview` CLI, the new `sf agent trace` (May 2026), and emits YAML compatible with `sf agent test run-eval` so your exploratory tests become CI regression specs.
+Aligned with Agentforce DX as of TrailblazerDX 2026. Uses Agent Script v2.0 (`subagent` — the renamed term for what used to be called `topic`), the GA `sf agent preview` CLI, the new `sf agent trace` (May 2026), and emits YAML compatible with `sf agent test run-eval` so your exploratory tests become CI regression specs.
 
 **Complements Salesforce's native testing — it doesn't replace it.**
 

@@ -83,17 +83,11 @@ npx -y sfagent-tools-mcp-server@latest
 
 ---
 
-## Built on the TrailblazerDX 2026 stack
+## Built on the latest Salesforce tooling
 
-This is a **collaborator with Salesforce's native tooling, not a replacement**. We use exactly what Salesforce ships today:
+Aligned with Agentforce DX as of TrailblazerDX 2026. Uses Agent Script v2.0 ("subagent") terminology, the GA `sf agent preview` CLI, the new `sf agent trace` (May 2026), and emits YAML compatible with `sf agent test run-eval` so your exploratory tests become CI regression specs.
 
-- **Agent Script v2.0 terminology** — "subagent" (the April 2026 rename from "topic")
-- **`sf agent preview`** (GA March 2026) — the official path for headless conversations
-- **`sf agent trace`** (May 20, 2026) — Salesforce's own session traces via our `read_trace` tool
-- **`sf agent test run-eval` YAML** (May 20, 2026 Beta) — our `generate_test_spec` emits compatible specs
-- **`@salesforce/core` SDK** — current programmatic auth, unaffected by the May 27 CLI token-redaction change
-
-Nothing deprecated. Nothing scraped from CLI text. Nothing that bypasses Salesforce governance.
+**Complements Salesforce's native testing — it doesn't replace it.**
 
 ---
 

@@ -8,7 +8,7 @@
 [![Works in Claude Code](https://img.shields.io/badge/Claude_Code-supported-D97757.svg)](https://code.claude.com)
 [![Works in OpenAI Codex](https://img.shields.io/badge/OpenAI_Codex-supported-10A37F.svg)](https://developers.openai.com/codex)
 
-<video src="https://github.com/lucianostraga/sfagent-tools/raw/main/demo/sfagent-tools-demo.mp4" controls width="100%"></video>
+https://github.com/user-attachments/assets/8bf1fb01-6f6b-4916-9149-b1fbbba8c707
 
 ---
 

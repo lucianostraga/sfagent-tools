@@ -1,6 +1,7 @@
 # SFAgent Tools
 
-> **The first AI-orchestrated testing toolkit for Salesforce Agentforce.** Tell your AI assistant what to test. It reads your agent's brain, runs dozens of headless conversations, and gives you a scored report with fix recommendations — in minutes, not hours.
+> **The first AI-driven testing toolkit for Salesforce Agentforce.**
+> Test your agent in 2 minutes. No scripts. No YAML. No new credentials.
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![npm](https://img.shields.io/npm/v/sfagent-tools-mcp-server.svg)](https://www.npmjs.com/package/sfagent-tools-mcp-server)
@@ -9,48 +10,60 @@
 
 https://github.com/lucianostraga/sfagent-tools/raw/main/demo/sfagent-tools-demo.mp4
 
-```
-You: "Generate tests for my Agentforce agent"
-```
-
-That's it. Your AI assistant does the rest.
-
 ---
 
-## What it does
+## Install in 30 seconds
 
-You built an Agentforce agent. Now you need to know:
-
-- Does it route to the right **subagent** when a customer says "my order is late"?
-- What happens when someone says "ignore your instructions"?
-- Does it maintain context across a 5-turn conversation?
-- Does it follow your business rules? ("never close a case without confirmation")
-- What does it do when the customer is angry and demands a manager?
-
-**Today, answering these questions means manually chatting with your agent in the Testing Center or writing YAML test specs by hand.** That takes hours and you'll miss edge cases.
-
-SFAgent Tools lets Claude (or Codex) do it for you in minutes:
-
-1. **Reads your agent** — calls `get_agent_metadata` to discover every subagent, action, and description in your configuration.
-2. **Designs scenarios** — happy paths per subagent, edge cases, prompt-injection probes, escalation tests, multi-turn context checks.
-3. **Has real conversations** — headless multi-turn sessions via `sf agent preview`. Streams a live transcript you can watch in a split pane.
-4. **Scores and reports** — routing accuracy, guardrail strength, business-rule compliance, multi-turn coherence — all in a Markdown report.
-5. **Hands off to native regression** — generates a YAML spec compatible with `sf agent test run-eval` so your CI runs the same scenarios on every commit.
-
----
-
-## Install — pick your assistant
-
-### Claude Code
+**Claude Code:**
 
 ```bash
 /plugin marketplace add lucianostraga/sfagent-tools
 /plugin install sfagent-tools@sfagent-tools-marketplace
 ```
 
-Then in any project: ask Claude *"Generate tests for my Agentforce agent."*
+That's it. Now in any project, just say:
 
-### OpenAI Codex
+> *"Generate tests for my Agentforce agent"*
+
+And your AI does the rest.
+
+---
+
+## Why this exists
+
+You built an Agentforce agent. Now you need to know:
+
+- Does it route to the right subagent when a customer says *"my order is late"*?
+- What happens when someone says *"ignore your instructions"*?
+- Does it remember context across a 5-turn conversation?
+- Does it actually follow your business rules?
+- What does it do when the customer demands a manager?
+
+**Today, answering these questions means hours of manual chatting in Testing Center, or hand-writing YAML specs.** You'll get tired, miss edge cases, and ship anyway.
+
+**SFAgent Tools turns those hours into minutes.**
+
+---
+
+## How it works
+
+1. **Reads your agent** — discovers every subagent, action, and description in your org
+2. **Designs scenarios** — happy paths, edge cases, prompt-injection probes, escalation tests, multi-turn context checks
+3. **Has real conversations** — headless multi-turn sessions through `sf agent preview`. You watch them happen live in a split pane.
+4. **Scores everything** — routing accuracy, guardrails, business-rule compliance, multi-turn coherence — in a clean Markdown report
+5. **Hands off to CI** — generates a YAML spec for `sf agent test run-eval` so the same scenarios run on every commit
+
+---
+
+## Zero setup beyond what you already have
+
+If you've ever run `sf org login web`, you're done. SFAgent Tools reuses your existing Salesforce CLI authentication. **No new credentials. No External Client App. No connected app setup. No tokens to manage.**
+
+Production orgs are blocked at the tool level — testing only runs against sandboxes, scratch orgs, or Developer Edition.
+
+---
+
+## Also works with OpenAI Codex
 
 Add to `~/.codex/config.toml`:
 
@@ -60,55 +73,36 @@ command = "npx"
 args = ["-y", "sfagent-tools-mcp-server@latest"]
 ```
 
-Or install the full Codex plugin (skills + marketplace metadata) — see [packages/codex-plugin/README.md](packages/codex-plugin/README.md).
+For the full Codex plugin experience (skills + marketplace metadata), see [packages/codex-plugin/README.md](packages/codex-plugin/README.md).
 
-### Any other MCP-compatible client
+**Or with any other MCP-compatible client** (Cursor, Continue.dev, Cline, Windsurf, custom agents):
 
 ```bash
 npx -y sfagent-tools-mcp-server@latest
 ```
 
-Works with Cursor, Continue.dev, Cline, Windsurf, or any custom MCP client.
+---
+
+## Built on the TrailblazerDX 2026 stack
+
+This is a **collaborator with Salesforce's native tooling, not a replacement**. We use exactly what Salesforce ships today:
+
+- **Agent Script v2.0 terminology** — "subagent" (the April 2026 rename from "topic")
+- **`sf agent preview`** (GA March 2026) — the official path for headless conversations
+- **`sf agent trace`** (May 20, 2026) — Salesforce's own session traces via our `read_trace` tool
+- **`sf agent test run-eval` YAML** (May 20, 2026 Beta) — our `generate_test_spec` emits compatible specs
+- **`@salesforce/core` SDK** — current programmatic auth, unaffected by the May 27 CLI token-redaction change
+
+Nothing deprecated. Nothing scraped from CLI text. Nothing that bypasses Salesforce governance.
 
 ---
 
-## Built for Salesforce developers, aligned with TrailblazerDX 2026
+## What you get (12 MCP tools)
 
-This tool is intentionally a **collaborator with Salesforce's native tooling, not a replacement.** Every Salesforce surface we use is what Salesforce themselves recommend right now:
-
-| Capability | What we use | Why it matters |
-|---|---|---|
-| **Agent Script v2.0 terminology** | "Subagent" (the April 2026 rename from "topic") | Code, prompts, and reports all use the current terminology |
-| **`sf agent preview` GA** | Native CLI for headless conversations | Reuses your existing org auth — zero new credentials |
-| **`sf agent trace` (May 20, 2026)** | New `list_traces` / `read_trace` tools | Pulls Salesforce's own step-by-step session traces |
-| **`sf agent test run-eval` YAML (May 20, 2026 Beta)** | New `generate_test_spec` tool | Hands off exploratory sessions as regression specs for CI |
-| **`@salesforce/core` AuthInfo/Org** | Programmatic auth | Unaffected by the May 27, 2026 CLI token-redaction change |
-| **External Client App** | Not required | Works on day one with `sf org login web` — no ECA setup |
-
-**Nothing deprecated. Nothing scraped from CLI text output. Nothing that bypasses Salesforce governance.** Production orgs are blocked at the tool level — testing only runs against sandboxes, scratch orgs, or Developer Edition.
-
----
-
-## What's inside
-
-12 MCP tools, grouped by what you'd use them for:
-
-**Discover your agent**
-- `list_orgs` — sf-authenticated Salesforce orgs
-- `list_agents` — Agentforce agents in an org
-- `get_agent_metadata` — full subagent + action map
-- `load_config` — read business rules from `sfagent-config.yaml`
-
-**Run live conversations**
-- `start_session` / `send_message` / `end_session` — multi-turn via `sf agent preview`
-- Live transcript written to `sfagent-reports/live-conversation.md` while tests run
-
-**Diagnose failures with native traces** *(sf CLI 2026-05-20+)*
-- `list_traces` / `read_trace` — read Salesforce's own session traces to see exactly which subagent routed and which actions ran
-
-**Hand off to native regression**
-- `generate_test_spec` — emit YAML for `sf agent test run-eval`
-- `run_batch_test` / `get_test_results` — drive native test suites
+**Discover** — `list_orgs`, `list_agents`, `get_agent_metadata`, `load_config`
+**Converse** — `start_session`, `send_message`, `end_session`
+**Diagnose** — `list_traces`, `read_trace` *(sf CLI 2026-05-20+)*
+**Regress** — `generate_test_spec`, `run_batch_test`, `get_test_results`
 
 ---
 
@@ -116,30 +110,28 @@ This tool is intentionally a **collaborator with Salesforce's native tooling, no
 
 - [Salesforce CLI](https://developer.salesforce.com/tools/sfdxcli) (`sf` v2.131 or later)
 - A Salesforce sandbox, scratch org, or Developer Edition with at least one Agentforce agent
-- `sf org login web --alias <your-org>` already run (the plugin reuses your sf CLI auth — no new credentials)
-- Node.js 20+ (for `npx`-based server install)
-- Claude Code or OpenAI Codex (any MCP-compatible client works)
-
-For Codex, see the [sandbox configuration notes](packages/codex-plugin/README.md#sandbox-configuration-important).
+- `sf org login web --alias <your-org>` already run
+- Node.js 20+ (for the npx-based server install)
+- Claude Code or OpenAI Codex (or any MCP-compatible client)
 
 ---
 
 ## Architecture (for the curious)
 
-This is a monorepo. The MCP server is the actual product — both plugin packagings are thin wrappers around the same server.
+This is a monorepo. The MCP server is the actual product — both plugin packagings are thin wrappers around it.
 
 ```
 sfagent-tools/
 ├── packages/
-│   ├── server/                # sfagent-tools-mcp-server — the MCP server (TypeScript, published to npm)
-│   ├── claude-code-plugin/    # Anthropic Claude Code packaging
+│   ├── server/                # sfagent-tools-mcp-server (npm)
+│   ├── claude-code-plugin/    # Claude Code packaging
 │   └── codex-plugin/          # OpenAI Codex packaging
 ├── demo/                      # demo video and recording scripts
 ├── docs/                      # progress logs, architecture decisions
 └── discovery-docs/            # research that informed the design
 ```
 
-Both plugin packagings reference the same npm package (`sfagent-tools-mcp-server`). One server, one set of tests, two install paths.
+One server. One set of tools. Two install paths.
 
 ---
 
@@ -151,7 +143,7 @@ npm run build                                        # build the server
 claude --plugin-dir packages/claude-code-plugin      # test the Claude plugin locally
 ```
 
-Local Codex testing — see [packages/codex-plugin/README.md](packages/codex-plugin/README.md).
+For local Codex testing, see [packages/codex-plugin/README.md](packages/codex-plugin/README.md).
 
 ---
 

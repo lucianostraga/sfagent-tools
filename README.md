@@ -23,7 +23,7 @@
 - 🔁 **Hands off to CI** — emits YAML compatible with `sf agent test run-eval` so the same scenarios run on every commit.
 - 🩺 **Reads Salesforce's own traces** — `sf agent trace` shows exactly which subagent routed each turn and which actions ran. We surface it for diagnostics.
 - 🔐 **Zero new credentials** — reuses your `sf` CLI auth. No External Client App, no connected app, no tokens. Production orgs are blocked at the tool level.
-- 🤖 **Works in Claude Code AND OpenAI Codex** — same npm-published MCP server. Also works in Cursor, Continue.dev, Cline, Windsurf, or any MCP client.
+- 🤖 **Works in Claude Code AND OpenAI Codex** — same npm-published MCP server. Cursor, Continue.dev, Cline, Windsurf packagings coming soon.
 
 ---
 
@@ -153,13 +153,17 @@ Aligned with Agentforce DX as of TrailblazerDX 2026. Uses Agent Script v2.0 (`su
 
 ---
 
-## Also works with any MCP-compatible client
+## Other MCP clients (coming soon)
+
+The MCP server itself is generic — anything that speaks the Model Context Protocol can call it via:
 
 ```bash
 npx -y sfagent-tools-mcp-server@latest
 ```
 
-Cursor, Continue.dev, Cline, Windsurf, custom agents — anything that speaks MCP works.
+**Currently officially supported and tested:** Claude Code, OpenAI Codex.
+
+**Coming soon (packaged + tested):** Cursor, Continue.dev, Cline, Windsurf, Gemini CLI.
 
 For the full Codex plugin experience (skills + marketplace metadata), see [packages/codex-plugin/README.md](packages/codex-plugin/README.md).
 

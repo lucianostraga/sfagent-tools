@@ -1,46 +1,45 @@
 #!/bin/bash
-# Claude Code demo — runs a real claude --print session against the real
-# sfagent-tools MCP server. The user prompt is what a Salesforce dev would
-# actually type; the AI naturally orchestrates the tools to answer it.
+# Claude Code demo — runs a real claude --print session and renders output
+# IDENTICAL to the actual Claude Code interactive TUI format.
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$(dirname "$SCRIPT_DIR")/.."
 
 clear
-sleep 0.5
+sleep 0.4
 
-# Clean Claude Code banner
-printf '\033[38;2;215;119;87m✳\033[0m  \033[1mClaude Code\033[22m  \033[38;2;153;153;153m(v2.1.150)\033[0m\n'
-printf '\n'
-printf '   \033[38;2;153;153;153mmodel:\033[0m     \033[1mclaude-opus-4-7\033[22m  \033[38;2;153;153;153m(1M context)\033[0m\n'
-printf '   \033[38;2;153;153;153mdirectory:\033[0m ~/Documents/workspace/agentforce-claude\n'
-printf '\n'
-printf '\033[38;2;136;136;136m────────────────────────────────────────────────────────────────────────────\033[0m\n'
-sleep 1.4
+# Real Claude Code 3-line ASCII logo + version/model/cwd block
+PINK='\033[38;2;215;119;87m'
+RESET='\033[0m'
+DIM='\033[38;2;136;136;136m'
+BOLD='\033[1m'
 
-# Type the prompt — what a real dev would actually type
+printf "${PINK} ▐▛███▜▌${RESET}   ${BOLD}Claude Code${RESET} ${DIM}v2.1.150${RESET}\n"
+printf "${PINK}▝▜█████▛▘${RESET}  ${DIM}Opus 4.7 (1M context) · Claude Max${RESET}\n"
+printf "${PINK}  ▘▘ ▝▝  ${RESET}  ${DIM}~/Documents/workspace/agentforce-claude${RESET}\n"
+echo ""
+sleep 1.3
+
+# User prompt (short, realistic)
 printf '❯ '
-PROMPT="Run a quick sanity check on my Agentforce agent in sfagent-dev. Test 3 scenarios — a normal order question, an angry customer, and a customer threatening legal action. Tell me what works and what doesn't, then save the scenarios as a regression spec I can run in CI."
+PROMPT="test the agent in sfagent-dev — quick smoke test, real conversation"
 for (( i=0; i<${#PROMPT}; i++ )); do
   printf "%s" "${PROMPT:$i:1}"
-  sleep 0.012
+  sleep 0.022
 done
 echo ""
-sleep 0.7
+echo ""
+sleep 0.5
 
-# The actual full prompt to Claude (a bit more explicit so the AI does it tightly)
-FULL_PROMPT="Run a quick sanity check on my Agentforce agent in sfagent-dev. Test 3 scenarios — a normal order question, an angry customer, and a customer threatening legal action. Tell me what works and what doesn't, then save the scenarios as a regression spec I can run in CI.
+# Run Claude with a focused prompt that produces visible value
+FULL_PROMPT="Run a quick smoke test on the Agentforce agent in org sfagent-dev using sfagent-tools. Use exactly this flow, all on one session: start_session, send 'Can you help me with my order?', send 'My email is sarah.johnson@acme.com', send 'I want to speak to a manager now', generate_test_spec with suiteName 'smoke-test', end_session. Then in ONE short paragraph, tell me: which scenarios passed, which failed, and where the regression spec was saved. Be concise — this is a demo."
 
-Be efficient — find the agent, exercise it through one session with all 3 messages, generate the test spec from that session, then summarize findings in 3 short bullets. The org is sfagent-dev; use sfagent-tools for everything. Use 'sanity-check' as the suiteName."
-
-# Run Claude and pipe through the stream renderer
 claude --print --verbose --output-format stream-json --allow-dangerously-skip-permissions "$FULL_PROMPT" \
   | node "$SCRIPT_DIR/render-claude-stream.js"
 
-echo ""
 sleep 1
-printf '\033[38;2;136;136;136m────────────────────────────────────────────────────────────────────────────\033[0m\n'
-printf '\033[1mAsk it like a teammate. It tests like a teammate.\033[0m\n'
-printf '\033[2mInstall:\033[0m  claude plugin install sfagent-tools@sfagent-tools-marketplace\n'
+printf "${DIM}────────────────────────────────────────────────────────────────────────────${RESET}\n"
+printf "${BOLD}One sentence. Real conversation. Real findings. Ready for CI.${RESET}\n"
+printf "${DIM}Install:${RESET}  claude plugin install sfagent-tools@sfagent-tools-marketplace\n"
 sleep 2.5

@@ -1,9 +1,8 @@
 {
   "mcpServers": {
     "sfagent-tools": {
-      "command": "node",
-      "args": ["/Users/lucianostraga/Documents/workspace/agentforce-claude/sfagent-tools/dist/index.js"],
-      "cwd": "/Users/lucianostraga/Documents/workspace/agentforce-claude/sfagent-tools"
+      "command": "npx",
+      "args": ["-y", "sfagent-tools-mcp-server@latest"]
     }
   }
 }

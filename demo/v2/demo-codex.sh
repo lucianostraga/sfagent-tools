@@ -1,5 +1,6 @@
 #!/bin/bash
-# Codex demo — runs a real codex exec session, matches real Codex startup.
+# Codex demo — runs a real codex exec session, matches real Codex startup,
+# paces the collapsed tool-call lines so they're readable.
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -35,21 +36,34 @@ sleep 0.5
 
 FULL_PROMPT="Run a quick smoke test on the Agentforce agent in org sfagent-dev using sfagent-tools. Use exactly this flow, all on one session: start_session, send 'Can you help me with my order?', send 'My email is sarah.johnson@acme.com', send 'I want to speak to a manager now', generate_test_spec with suiteName 'smoke-test', end_session. Then in ONE short paragraph, tell me: which scenarios passed, which failed, and where the regression spec was saved. Be concise — this is a demo."
 
-# Codex exec already prints MCP tool calls cleanly. Filter banner/echo, then
-# collapse each "mcp: sfagent-tools/X started" + "mcp: ... completed" pair
-# into a single "⏺ Called sfagent-tools (ctrl+o to expand)" line to match
-# the real Codex collapsed-call display.
-codex exec --dangerously-bypass-approvals-and-sandbox "$FULL_PROMPT" 2>&1 \
-  | awk '
-      /^(OpenAI Codex|--------|workdir:|model:|provider:|approval:|sandbox:|reasoning|session id:|tokens used|user$|codex$|Reading additional|Run a quick|Be efficient|Use exactly)/ { next }
-      /^mcp: sfagent-tools\// {
-        if ($0 ~ /\(completed\)/) {
-          printf "\033[38;2;16;163;127m⏺\033[0m \033[38;2;136;136;136mCalled sfagent-tools (ctrl+o to expand)\033[0m\n\n"
-        }
-        next
-      }
-      { print }
-    '
+# Pipe codex output through a small filter that:
+# - drops Codex's own banner (we already painted ours)
+# - shows each MCP tool call individually as it COMPLETES, with a pause
+#   between calls so the viewer can read each one
+codex exec --dangerously-bypass-approvals-and-sandbox "$FULL_PROMPT" 2>&1 | python3 -c "
+import sys, re, time
+GREEN = '\\033[38;2;16;163;127m'
+GRAY = '\\033[38;2;136;136;136m'
+BOLD = '\\033[1m'
+RESET = '\\033[0m'
+SKIP = re.compile(r'^(OpenAI Codex|--------|workdir:|model:|provider:|approval:|sandbox:|reasoning|session id:|tokens used|user\$|codex\$|Reading additional|Run a quick|Be concise|Use exactly|And in ONE)')
+for line in sys.stdin:
+    s = line.rstrip()
+    if SKIP.match(s):
+        continue
+    m = re.match(r'^mcp: sfagent-tools/(\\S+)\\s+\\((completed)\\)', s)
+    if m:
+        tool = m.group(1)
+        sys.stdout.write(f'  {GRAY}⎿ Called {RESET}{BOLD}sfagent-tools{RESET}{GRAY} - {tool}{RESET}\\n')
+        sys.stdout.flush()
+        time.sleep(0.4)
+        continue
+    if s.startswith('mcp: sfagent-tools/'):
+        # 'started' lines — skip, we wait for 'completed'
+        continue
+    print(s)
+    sys.stdout.flush()
+"
 
 sleep 1
 printf "${DIM}────────────────────────────────────────────────────────────────────────────${RESET}\n"

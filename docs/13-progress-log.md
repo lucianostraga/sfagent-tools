@@ -509,3 +509,56 @@ Removed the entire v0.1 Playwright + edge-tts demo pipeline (~103 MB local, ~70 
 4. **Production-style narrated demos beat realistic ones for marketplace pitches** — but user prompts WITHIN those demos have to be realistic ("test my agent") not artificial ("walk me through every tool").
 5. **Per-tool clips solved the "wall of text" problem** — 10 short focused clips read better than one long demo, even if the total content is similar.
 6. **Tool descriptions that overlap with other MCP servers need disambiguating language** — `list_orgs` overlaps with Salesforce DX MCP, so we reframed to signal our testing context.
+
+---
+
+## Phase 7: Per-tool demos, Vibes, marketplace reality-check, competitive analysis (2026-05-26)
+
+### Demo videos — final form: per-tool clip grid
+After the v1.0.0 "sanity check" demo, iterated further on user feedback. Tried a tool-by-tool walkthrough ("disaster — wall of text"), then landed on **10 short per-tool clips** (~8-10s each) in a README grid organized by purpose (Discover / Run a live test / Hand off to CI / Diagnose). Built via `demo/v3/build-clips.sh` (capture real `claude --print` output per tool → replay through paced renderer → asciinema → gif/mp4). The main "sanity check" demo stays as the hero; the grid shows each capability individually. Key realization that fixed pacing: `claude --print` dumps all output in one burst after 30-70s of thinking, so we **pre-capture and replay** rather than record live.
+
+### README restructured as a sales pitch
+Reordered for marketplace discovery: hero tagline → 9-bullet "What it does" (benefit-oriented, emoji markers) → demos → install (Claude + Codex + Vibes) → per-tool grid → why/how/etc. Added `(formerly topic)` subagent clarification at the first mention in every section. Reframed `list_orgs` to "pick which org to test your agent in" to avoid overlap perception with Salesforce DX MCP. Soft-pedaled Cursor/Continue/Cline/Windsurf as "coming soon" (not yet packaged).
+
+### Agentforce Vibes — confirmed compatible, added as first-class client
+Researched and confirmed Vibes (Salesforce's enterprise vibe-coding IDE + VS Code extension, GA at TDX 2026) is fully MCP-compatible: reads `a4d_mcp_settings.json` with the same `command`/`args` schema as Claude/Codex, supports `npx`, defaults to Claude Sonnet 4.5. Wired `sfagent-tools` into the user's actual VS Code + Cursor Vibes configs. Added Vibes to the hero tagline, a badge, the install section, and "currently supported." Strategic point: Vibes is arguably the most natural home for an Agentforce testing tool (user already inside the SF ecosystem).
+
+### Demo pipeline cleanup
+Removed ~70 MB of dead v0.1 Playwright + edge-tts pipeline (audio/, recordings/, old scripts, node_modules, .venv, original 2.1 MB mp4). 752 files changed, 171,715 deletions.
+
+### Community marketplace — the reality check
+Discovered `sfagent-tools` IS live in `claude-community` — but pinned to the **orphaned** commit `097f5f8` (v0.1, plugin-at-repo-root). Reviewer note confirmed it's live (after some internal "Layer D testing" row-flipping).
+
+**Two compounding problems surfaced:**
+1. **Auto-bump is dead.** The session's opening force-push (canonicalize-on-local) left `097f5f8` with NO common ancestor to `main`. The marketplace CI walks commits forward from the pinned SHA — impossible across divergent histories. The live pin will never self-advance to v1.0.0; only a fresh review can move it.
+2. **Monorepo move broke the bare-URL submission.** The plugin left the repo root, but the submit form has only a single "Link to plugin" URL field (no separate path). I had wrongly assured the user the restructure was "safe for the submission" by assuming a path field existed. Owned the mistake.
+
+**Fixes applied:**
+- Added a **root `.claude-plugin/marketplace.json`** with `source: "./packages/claude-code-plugin"` — makes the bare repo URL + `/plugin marketplace add` both resolve to the subdir plugin. This mirrors how 177 other community monorepo plugins work (Anthropic converts root-marketplace-pointing-to-subdir into `git-subdir` catalog entries). Verified by fresh-cloning from GitHub and `claude plugin validate . --strict`.
+- Removed the now-redundant subdir `marketplace.json` (kept the plugin.json). Single canonical marketplace at root.
+- Wrote `docs/14-marketplace-submission-playbook.md` — root causes, exact resubmission values (deep-link URL `…/tree/main/packages/claude-code-plugin`, lowercase `sfagent-tools` name), catalog-check command, decision tree.
+
+**Decision: don't resubmit yet.** Wait a bounded 48h to see if the pending May 23 review re-clones latest main (picking up the root marketplace.json). Auto-bump won't help, so if it's still pinned to `097f5f8` after 48h, resubmit fresh with the deep-link URL. Removal isn't useful — a correct fresh submission supersedes the stale entry, and removal would only create an installable-gap. No documented self-service removal exists anyway.
+
+### Competitive analysis
+Surveyed the community catalog: 9 Salesforce plugins, only ONE direct Agentforce-testing competitor — `agentforce-adlc` (SalesforceAIResearch). Key facts:
+- **We're first.** sfagent-tools repo created 2026-03-28, published Mar 28. agentforce-adlc created 2026-04-10 — 13 days later. The "first AI-driven testing toolkit for Agentforce" claim is provable.
+- **They're skills-only + Claude-only.** We're MCP-native (12 executable tools) + cross-client (Claude/Codex/Vibes) + npm-published. Genuine differentiation.
+- **They have more traction** (61 stars vs our 22) — the "SalesforceAIResearch" brand effect. So claim "first" but not "most popular."
+
+### Verified Codex + Vibes survived the marketplace changes
+After removing/moving marketplace.json files, confirmed Codex + Vibes still work — they install via `npx -y sfagent-tools-mcp-server@latest` (npm package, independent of marketplace.json). Proved with a live `codex exec list_agents` call returning `Agentforce_Service_Agent`.
+
+### Where it stands end of Phase 7
+- npm `1.0.0`, GitHub `v1.0.0` release, all 5 version slots aligned
+- Live in `claude-community` (v0.1 pin) + v1.0.0 update pending review with the path fix now on main
+- Works in Claude Code, Codex (proven), Vibes (config wired, same npm package)
+- First-mover, documented, clean repo
+- Open item: community pin advancing v0.1 → v1.0.0 (48h watch, then resubmit per playbook)
+
+### Lessons learned (Phase 7)
+1. **Don't force-push over a published commit** — it orphans the marketplace pin and kills auto-update. Rebase/merge to preserve ancestry.
+2. **Verify the actual submission/distribution mechanism before declaring a structural change "safe"** — I assumed a path field existed; it didn't. The monorepo move silently broke the bare-URL submission.
+3. **A monorepo IS marketplace-compatible** via a root marketplace.json pointing at subdirs (177 plugins prove it) — but you have to add that root manifest; moving the plugin alone isn't enough.
+4. **"First" is about creation date, not traction** — we're provably first (Mar 28 vs Apr 10) even though the Salesforce-brand competitor has more stars.
+5. **Removal ≠ the fix for a stale listing** — a correct fresh submission supersedes; removal just creates downtime.

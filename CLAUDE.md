@@ -23,8 +23,10 @@ This is a monorepo for the **sfagent-tools** plugin: an AI-driven testing toolki
 
 1. The MCP server (`packages/server/`) is the single source of truth. Both plugin packagings reference it via `npx -y sfagent-tools-mcp-server@latest`. Don't duplicate logic in the plugin folders.
 2. Tool behavior change → bump server version, publish to npm, both plugins auto-pick it up on next `npx` invocation.
-3. Plugin metadata change (description, displayName, install path) → bump the plugin version in `plugin.json` AND `marketplace.json` (the same number, in both files).
-4. The five places version lives: root `package.json`, `packages/server/package.json`, both `plugin.json`s, plus the `version` field inside `marketplace.json`'s `plugins[0]` block. Keep them in sync.
+3. Plugin metadata change (description, displayName, install path) → bump the plugin version in `plugin.json` AND the root `marketplace.json` (the same number).
+4. The version lives in five places — keep them in sync: root `package.json`, `packages/server/package.json`, both `plugin.json`s (`packages/claude-code-plugin/.claude-plugin/` + `packages/codex-plugin/.codex-plugin/`), plus the `plugins[0].version` field inside the **root** `.claude-plugin/marketplace.json`.
+
+> **Marketplace layout:** the canonical Claude Code marketplace listing is the **root** `.claude-plugin/marketplace.json` (it points the community-submission's bare repo URL to `./packages/claude-code-plugin`). The plugin manifest itself stays at `packages/claude-code-plugin/.claude-plugin/plugin.json`. Don't re-add a `marketplace.json` inside `packages/claude-code-plugin/` — that created a duplicate listing. Codex has its own separate marketplace at `packages/codex-plugin/.agents/plugins/marketplace.json`.
 
 ## Things to be careful with
 

@@ -16,7 +16,8 @@
       "Bash(say -v \\\\?)",
       "Bash(claude plugin *)",
       "Bash(git add *)",
-      "mcp__sfagent-tools__generate_test_spec"
+      "mcp__sfagent-tools__generate_test_spec",
+      "Bash(curl -s https://raw.githubusercontent.com/anthropics/claude-plugins-community/main/.claude-plugin/marketplace.json)"
     ],
     "additionalDirectories": [
       "/Users/lucianostraga/Documents/workspace/sfagent-tools"

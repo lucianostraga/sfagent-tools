@@ -22,8 +22,10 @@ This is a monorepo for the **sfagent-tools** plugin: an AI-driven testing toolki
 
 1. MCP server (`packages/server/`) is the single source of truth. Both plugin packagings reference it via `npx -y sfagent-tools-mcp-server@latest`.
 2. Tool behavior change → bump server version, publish to npm, both plugins auto-pick it up.
-3. Plugin metadata change → bump version in `plugin.json` AND `marketplace.json` (same number, both files).
-4. Five places version lives — keep them in sync: root `package.json`, server `package.json`, both `plugin.json`s, marketplace.json's `plugins[0].version`.
+3. Plugin metadata change → bump version in `plugin.json` AND the root `marketplace.json` (same number).
+4. Five places version lives — keep them in sync: root `package.json`, server `package.json`, both `plugin.json`s, and the root `.claude-plugin/marketplace.json` `plugins[0].version`.
+
+> **Marketplace layout:** canonical Claude Code listing is the **root** `.claude-plugin/marketplace.json` (resolves the community submission's bare repo URL to `./packages/claude-code-plugin`). The Claude plugin manifest stays at `packages/claude-code-plugin/.claude-plugin/plugin.json` — no `marketplace.json` beside it (that's a duplicate). Codex has its own at `packages/codex-plugin/.agents/plugins/marketplace.json`.
 
 ## Codex-specific notes
 

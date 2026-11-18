@@ -92,6 +92,7 @@ Make sure a native test exists for the same utterance, using the new runner and 
 
 ```yaml
 name: <Test_Name>
+description: <one line; required, it becomes the test's label>
 subjectType: AGENT
 subjectName: <AgentApiName>
 testCases:
@@ -103,13 +104,15 @@ testCases:
 ```
 
 `sf agent test create --spec <file> --api-name <Test_Name> --test-runner agentforce-studio`, then
-`sf agent test run --api-name <Test_Name> --wait 20 --result-format json`. Report both results together:
+`sf agent test run --api-name <Test_Name> --wait 20 --json` (with `--result-format json` the progress animation
+gets mixed into the output). Report both results together:
 "native: routed to `<subagent>`; UI: form and card verified" (or which layer failed).
 
 ## Known issues (Salesforce CLI 2.158, Playwright 1.64)
 
 - `sf agent test run --result-format junit` can write "Unknown error" for passing `agentforce-studio` tests; read
-  `--result-format json` (`testScorerResults[].scorerResponse`).
+  `--json` instead (`testScorerResults[].scorerResponse`).
+- A native test spec without `description` fails with "Required fields are missing: [MasterLabel]".
 - Right after creating a scratch org, `sf agent publish authoring-bundle` can fail with `fetch failed` for a few
   minutes while the agent API learns about the org; retry.
 - The panel shows first-run screens (a memory dialog and a disclaimer) and ignores messages until it is ready;

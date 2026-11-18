@@ -11,7 +11,7 @@
 </tr>
 </table>
 
-<sub>Real runs in a scratch org, replayed. [Full walkthrough video (MP4, 85 s)](demo/prompt-to-pixel.mp4)</sub>
+<sub>Real runs in a scratch org (the top GIF at 1.5x). [Full walkthrough video (MP4, 85 s)](demo/prompt-to-pixel.mp4)</sub>
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![npm](https://img.shields.io/npm/v/sfagent-tools-mcp-server.svg)](https://www.npmjs.com/package/sfagent-tools-mcp-server)

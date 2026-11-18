@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { createRequire } from 'node:module';
 
 import { listOrgsSchema, listOrgs } from './tools/orgs.js';
 import { listAgentsSchema, listAgents } from './tools/agents.js';
@@ -13,9 +14,12 @@ import { loadConfigSchema, loadConfig } from './tools/config.js';
 import { listTracesSchema, listTraces, readTraceSchema, readTrace } from './tools/trace.js';
 import { generateTestSpecSchema, generateTestSpec } from './tools/test-spec.js';
 
+// One source of truth for the version: the package itself.
+const { version } = createRequire(import.meta.url)('../package.json') as { version: string };
+
 const server = new McpServer({
   name: 'sfagent-tools',
-  version: '0.2.0',
+  version,
 });
 
 // Tool: list_orgs
@@ -37,7 +41,7 @@ server.tool(
 // Tool: start_session
 server.tool(
   'start_session',
-  'Start a headless conversation session with an Agentforce agent via sf agent preview. Returns a sessionId for use with send_message. Blocks production orgs. Use the agentApiName from list_agents.',
+  'Start a headless conversation session with an Agentforce agent via sf agent preview. Returns a sessionId for use with send_message. Blocks production orgs. Use the agentApiName from list_agents, or authoringBundle=true to preview a local Agent Script bundle (simulated actions by default). Accepts typed context variables.',
   startSessionSchema.shape,
   async (args) => startSession(startSessionSchema.parse(args))
 );
@@ -45,7 +49,7 @@ server.tool(
 // Tool: send_message
 server.tool(
   'send_message',
-  'Send a message to an active Agentforce agent session and receive the full response. Uses sf agent preview send internally.',
+  'Send a message to an active Agentforce agent session and receive the full response. Uses sf agent preview send internally. If the agent asks for input through a Custom Lightning Type form, the result says so (rendersUi): that part needs a browser test.',
   sendMessageSchema.shape,
   async (args) => sendMessage(sendMessageSchema.parse(args))
 );
@@ -61,7 +65,7 @@ server.tool(
 // Tool: run_batch_test
 server.tool(
   'run_batch_test',
-  'Run a predefined Agentforce test suite (AiEvaluationDefinition) via the sf CLI. Waits for completion and returns the run ID. Blocks production orgs.',
+  'Run an Agentforce test via the sf CLI: an AiTestingDefinition (Agentforce Studio) or a legacy AiEvaluationDefinition (Testing Center). Waits for completion and returns the run ID and its normalized state. Blocks production orgs.',
   runBatchTestSchema.shape,
   async (args) => runBatchTest(runBatchTestSchema.parse(args))
 );

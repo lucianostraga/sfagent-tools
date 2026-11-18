@@ -1,42 +1,48 @@
 # SFAgent Tools
 
-> **The first AI-driven testing toolkit for Salesforce Agentforce — in Claude Code, OpenAI Codex, and Agentforce Vibes.**
+> **Test Agentforce agents from prompt to pixel, with Claude Code and Playwright.**
 >
-> Tell your AI assistant what to test. It reads your agent's brain, runs real headless conversations, finds what's broken, and hands you a scored report plus a YAML spec for CI. **In minutes, not hours. Zero new credentials.**
+> Salesforce's native tests check what your agent **decides**: the subagent, the actions, the answer. SFAgent Tools adds
+> what they can't see: the **forms and cards your agent renders** for the user. Claude Code explores the agent, writes
+> both kinds of tests, runs them and tells you which layer broke.
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![npm](https://img.shields.io/npm/v/sfagent-tools-mcp-server.svg)](https://www.npmjs.com/package/sfagent-tools-mcp-server)
 [![Works in Claude Code](https://img.shields.io/badge/Claude_Code-supported-D97757.svg)](https://code.claude.com)
+[![Playwright](https://img.shields.io/badge/Playwright-UI_tests-2EAD33.svg)](https://playwright.dev)
 [![Works in OpenAI Codex](https://img.shields.io/badge/OpenAI_Codex-supported-10A37F.svg)](https://developers.openai.com/codex)
 [![Works in Agentforce Vibes](https://img.shields.io/badge/Agentforce_Vibes-supported-00A1E0.svg)](https://developer.salesforce.com/docs/platform/einstein-for-devs/guide/devagent-mcp.html)
 
 ---
 
-## What it does
+## Two layers, one scenario
 
-> 📝 **Terminology:** *subagent* is Salesforce's renamed term for what was called *topic* before Agent Script v2.0 (April 2026). Same thing, new name — used throughout this README and the plugin.
+| Layer | What it checks | How |
+| --- | --- | --- |
+| **What the agent decides** | Routing to the right subagent, actions, the response | Native Agentforce tests (Agentforce Studio or Testing Center), created and run through the MCP tools |
+| **What the user sees** | Custom Lightning Type forms and cards in the Agentforce panel | Playwright tests that Claude Code writes and runs with the `agentforce-ui-test` skill |
 
-- 🔍 **Discovers your agent** — reads every subagent (formerly *topic*), action, and description from your org so the AI knows what to test before testing it.
-- 💬 **Has real conversations** — drives headless multi-turn sessions through `sf agent preview`. Live transcript in markdown you can watch in a split pane.
-- 🛡️ **Probes guardrails** — prompt-injection attempts, off-topic requests, legal threats, manager-escalation triggers, identity-verification gates — automatically.
-- 📏 **Validates your business rules** — load expectations from `sfagent-config.yaml` (topic-specific rules, global rules, custom scenarios) and the AI scores each one.
-- 📊 **Scores everything** — routing accuracy, guardrail strength, multi-turn coherence, business-rule compliance — in a clean Markdown report.
-- 🔁 **Hands off to CI** — emits YAML compatible with `sf agent test run-eval` so the same scenarios run on every commit.
-- 🩺 **Reads Salesforce's own traces** — `sf agent trace` shows exactly which subagent routed each turn and which actions ran. We surface it for diagnostics.
-- 🔐 **Zero new credentials** — reuses your `sf` CLI auth. No External Client App, no connected app, no tokens. Production orgs are blocked at the tool level.
-- 🤖 **Works in Claude Code, OpenAI Codex, and Agentforce Vibes** — same npm-published MCP server. Cursor, Continue.dev, Cline, Windsurf packagings coming soon.
+Native tests run in a channel that reports `__supports_result_display__: false`: they never render the UI. Break the
+card your agent shows and the native test still passes. The Playwright test catches it.
 
----
+## Try it
 
-## See it work
+[`examples/agentforce-ui-demo`](examples/agentforce-ui-demo) has everything: a script that creates a scratch org, an
+employee agent whose action shows a form and a result card, a native test and a Playwright test. Then ask Claude Code:
 
-One sentence. Real agent. Real findings. Ready for CI.
+> *"Test what my agent shows users, end to end, and pair it with a native test."*
 
-![Claude Code demo](demo/sfagent-claude-demo.gif)
+## What's new in 2.0
 
-Same plugin, same agent, byte-identical answers — also in Codex:
-
-![OpenAI Codex demo](demo/sfagent-codex-demo.gif)
+- **UI layer:** the `agentforce-ui-test` skill and a Playwright kit (one-time frontdoor login, an Agentforce panel page
+  object, config).
+- **Native tests, current format:** Agentforce Studio tests (`AiTestingDefinition`) alongside legacy Testing Center
+  ones; run states normalized across both; scorer results parsed. `generate_test_spec` writes Agentforce Studio specs
+  by default.
+- **Conversations:** preview local authoring bundles (simulated actions by default), typed context variables, every
+  reply type kept, and a flag when the agent asks for input through a CLT form.
+- **Safer:** the CLI is called without a shell; the production guard asks the org and fails closed. The server now has
+  its own tests.
 
 ---
 
@@ -127,45 +133,16 @@ Plus `run_batch_test` and `get_test_results` for users who already have native `
 
 ---
 
-## Why this exists
+## How Claude Code uses it
 
-You built an Agentforce agent. Now you need to know:
+1. **Discover** the org, the agent and its subagents and actions (`list_orgs`, `list_agents`, `get_agent_metadata`).
+2. **Explore** with real headless conversations (`start_session`, `send_message`) and read Salesforce's own traces.
+3. **Lock in** what it found as native regression tests (`generate_test_spec`, `run_batch_test`, `get_test_results`).
+4. **Check the pixels**: for actions that render Custom Lightning Types, write and run Playwright tests against the
+   Agentforce panel (`agentforce-ui-test` skill).
 
-- Does it route to the right subagent (formerly *topic*) when a customer says *"my order is late"*?
-- What happens when someone says *"ignore your instructions"*?
-- Does it remember context across a 5-turn conversation?
-- Does it actually follow your business rules?
-- What does it do when the customer demands a manager?
-
-**Today, answering these questions means hours of manual chatting in Testing Center, or hand-writing YAML specs.** You'll get tired, miss edge cases, and ship anyway.
-
-**SFAgent Tools turns those hours into minutes.**
-
----
-
-## How it works
-
-1. **Reads your agent** — discovers every subagent (formerly *topic*), action, and description in your org
-2. **Designs scenarios** — happy paths, edge cases, prompt-injection probes, escalation tests, multi-turn context
-3. **Has real conversations** — headless multi-turn sessions through `sf agent preview`. You watch them happen live in a split pane.
-4. **Scores everything** — routing accuracy, guardrails, business-rule compliance, multi-turn coherence — in a clean Markdown report
-5. **Hands off to CI** — generates a YAML spec for `sf agent test run-eval` so the same scenarios run on every commit
-
----
-
-## Zero setup beyond what you already have
-
-If you've ever run `sf org login web`, you're done. SFAgent Tools reuses your existing Salesforce CLI authentication.
-
-**No new credentials. No External Client App. No connected app setup. No tokens to manage.** Production orgs are blocked at the tool level — testing only runs against sandboxes, scratch orgs, or Developer Edition.
-
----
-
-## Built on the latest Salesforce tooling
-
-Aligned with Agentforce DX as of TrailblazerDX 2026. Uses Agent Script v2.0 (`subagent` — the renamed term for what used to be called `topic`), the GA `sf agent preview` CLI, the new `sf agent trace` (May 2026), and emits YAML compatible with `sf agent test run-eval` so your exploratory tests become CI regression specs.
-
-**Complements Salesforce's native testing — it doesn't replace it.**
+Auth reuses your `sf` CLI login, including the UI tests (a fresh `sf org open --url-only` URL per run, never stored).
+Production orgs are blocked: the server asks the org and only allows sandboxes, scratch orgs and Developer Edition.
 
 ---
 
@@ -187,19 +164,19 @@ For the full Codex plugin experience (skills + marketplace metadata), see [packa
 
 ## Prerequisites
 
-- [Salesforce CLI](https://developer.salesforce.com/tools/sfdxcli) (`sf` v2.131 or later)
-- A Salesforce sandbox, scratch org, or Developer Edition with at least one Agentforce agent
-- `sf org login web --alias <your-org>` already run
-- Node.js 20+ (for the npx-based server install)
-- Claude Code or OpenAI Codex (or any MCP-compatible client)
+- [Salesforce CLI](https://developer.salesforce.com/tools/sfdxcli) 2.152 or later, on Node.js 22+
+- A sandbox, scratch org or Developer Edition org with an active Agentforce agent
+- For the UI layer: Playwright 1.6x with its Chromium, and a user with access to the agent in Lightning Experience
+- Claude Code (or any MCP client for the headless tools)
 
 ---
 
 ## Status
 
-- **v1.0.0** — current release. All 12 MCP tools verified end-to-end against a live Agentforce Service Agent in both Claude Code and Codex. Three patch fixes (RequiresProjectError, wrong trace-tool flags, graceful empty-trace fallback) hardened during smoke testing. Production-ready.
-- **v0.2.x** — internal iteration: monorepo restructure, Codex packaging, subagent terminology aligned with Agent Script v2.0, new trace + test-spec tools.
-- **v0.1.0** — initial Claude Code plugin with 9 MCP tools.
+- **2.0.0** (this branch): the Playwright UI layer, Agentforce Studio tests, safer CLI calls and server tests. Verified
+  end to end against a scratch org on November 18, 2026: Claude Code, starting from a project with no tests, wrote a
+  Playwright test and a native test for the same scenario and both passed.
+- **1.0.0** (May 2026): headless conversations, traces and run-eval specs, in Claude Code and Codex.
 
 ---
 

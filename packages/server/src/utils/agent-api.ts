@@ -1,113 +1,98 @@
-import { execSync } from 'node:child_process';
-import { getSfProjectDir } from './sf-project.js';
-import type { AgentSession, ConversationMessage } from '../types/index.js';
+import { runSf, runSfOk } from './sf.js';
+import type { AgentSession, ConversationMessage, SessionOptions } from '../types/index.js';
+
+// Arguments that identify the agent: a published agent (--api-name) or a local authoring bundle.
+function agentArgs(session: Pick<AgentSession, 'agentId' | 'authoringBundle'>): string[] {
+  return session.authoringBundle ? ['--authoring-bundle', session.agentId] : ['--api-name', session.agentId];
+}
+
+export function buildPreviewStartArgs(targetOrg: string, agentApiName: string, opts: SessionOptions = {}): string[] {
+  const args = ['agent', 'preview', 'start', '--target-org', targetOrg];
+  if (opts.authoringBundle) {
+    // Authoring bundles need an explicit mode; simulated actions are the safe default.
+    args.push('--authoring-bundle', agentApiName, opts.liveActions ? '--use-live-actions' : '--simulate-actions');
+  } else {
+    // Published agents always run their actions for real.
+    args.push('--api-name', agentApiName);
+  }
+  if (opts.contextVariables && opts.contextVariables.length > 0) {
+    args.push('--context-variables-json', JSON.stringify(opts.contextVariables));
+  }
+  return args;
+}
 
 export async function createSession(
   targetOrg: string,
-  agentApiName: string
+  agentApiName: string,
+  opts: SessionOptions = {}
 ): Promise<AgentSession> {
-  const result = execSync(
-    `sf agent preview start --api-name "${agentApiName}" --target-org "${targetOrg}" --json`,
-    { encoding: 'utf-8', timeout: 60000, cwd: getSfProjectDir() }
-  );
-
-  const parsed = JSON.parse(result) as {
-    status: number;
-    result: { sessionId: string };
-  };
-
-  if (!parsed.result?.sessionId) {
+  const result = await runSfOk<{ sessionId: string }>(buildPreviewStartArgs(targetOrg, agentApiName, opts), 120_000);
+  if (!result.sessionId) {
     throw new Error('No sessionId returned from sf agent preview start');
   }
-
   return {
-    sessionId: parsed.result.sessionId,
+    sessionId: result.sessionId,
     agentId: agentApiName,
     orgAlias: targetOrg,
+    authoringBundle: opts.authoringBundle ?? false,
     sequenceId: 0,
     messages: [],
   };
 }
 
-export async function sendMessage(
-  targetOrg: string,
-  agentApiName: string,
-  session: AgentSession,
-  messageText: string
-): Promise<{ response: string; session: AgentSession }> {
-  const sequenceId = session.sequenceId + 1;
-
-  // Escape double quotes and backslashes in the message for the CLI
-  const escapedMessage = messageText.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
-
-  let result: string;
-  try {
-    result = execSync(
-      `sf agent preview send --session-id "${session.sessionId}" --api-name "${agentApiName}" --utterance "${escapedMessage}" --target-org "${targetOrg}" --json`,
-      { encoding: 'utf-8', timeout: 180000, cwd: getSfProjectDir() }
-    );
-  } catch (err: unknown) {
-    const error = err as { status?: number; stdout?: string; message?: string };
-    // If we got stdout before timeout, try to use it
-    if (error.stdout) {
-      result = error.stdout;
-    } else {
-      throw new Error(`Agent did not respond within 3 minutes: ${error.message ?? 'timeout'}`);
-    }
-  }
-
-  const parsed = JSON.parse(result) as {
-    status: number;
-    result: {
-      messages: Array<{
-        type: string;
-        message: string;
-        id?: string;
-        feedbackId?: string;
-        isContentSafe?: boolean;
-      }>;
-    };
-  };
-
-  const agentMessages = parsed.result?.messages ?? [];
-  const responseText = agentMessages
-    .filter((m) => m.type === 'Inform' && m.message)
-    .map((m) => m.message)
-    .join('\n\n');
-
-  const userMessage: ConversationMessage = {
-    role: 'user',
-    content: messageText,
-    timestamp: new Date().toISOString(),
-    sequenceId,
-  };
-
-  const agentMessage: ConversationMessage = {
-    role: 'agent',
-    content: responseText || '(no response from agent)',
-    timestamp: new Date().toISOString(),
-    sequenceId,
-  };
-
-  const updatedSession: AgentSession = {
-    ...session,
-    sequenceId,
-    messages: [...session.messages, userMessage, agentMessage],
-  };
-
-  return { response: responseText || '(no response from agent)', session: updatedSession };
+interface PreviewMessage {
+  type: string;
+  message?: string;
+  collect?: Array<{ targetType?: string; targetProperty?: string }>;
 }
 
-export async function endSession(
+// Turns the agent's messages into one text. Any message type with text counts (Inform, Inquire, ...).
+// When the agent asks for input through a Custom Lightning Type editor, the user would see a form that a
+// headless session cannot render: say so instead of hiding it.
+export function summarizeAgentMessages(messages: PreviewMessage[]): { text: string; rendersUi: string[] } {
+  const text = messages
+    .filter((m) => m.message)
+    .map((m) => m.message as string)
+    .join('\n\n');
+  const rendersUi = messages
+    .flatMap((m) => m.collect ?? [])
+    .map((c) => `${c.targetType ?? 'unknown'}${c.targetProperty ? ` (${c.targetProperty})` : ''}`);
+  return { text, rendersUi };
+}
+
+export async function sendMessage(
   targetOrg: string,
-  sessionId: string
-): Promise<void> {
+  session: AgentSession,
+  messageText: string
+): Promise<{ response: string; rendersUi: string[]; session: AgentSession }> {
+  const sequenceId = session.sequenceId + 1;
+  const out = await runSf<{ messages?: PreviewMessage[] }>(
+    ['agent', 'preview', 'send', '--session-id', session.sessionId, ...agentArgs(session),
+      '--utterance', messageText, '--target-org', targetOrg],
+    180_000
+  );
+  if (out.status !== 0) {
+    throw new Error(out.message ?? 'The agent did not respond');
+  }
+
+  const { text, rendersUi } = summarizeAgentMessages(out.result?.messages ?? []);
+  const response = text || '(no response from agent)';
+  const now = new Date().toISOString();
+  const userMessage: ConversationMessage = { role: 'user', content: messageText, timestamp: now, sequenceId };
+  const agentMessage: ConversationMessage = { role: 'agent', content: response, timestamp: now, sequenceId };
+
+  return {
+    response,
+    rendersUi,
+    session: { ...session, sequenceId, messages: [...session.messages, userMessage, agentMessage] },
+  };
+}
+
+export async function endSession(targetOrg: string, session: AgentSession): Promise<void> {
   try {
-    execSync(
-      `sf agent preview end --session-id "${sessionId}" --target-org "${targetOrg}" --json`,
-      { encoding: 'utf-8', timeout: 30000, cwd: getSfProjectDir() }
-    );
+    await runSf(['agent', 'preview', 'end', '--session-id', session.sessionId, ...agentArgs(session),
+      '--target-org', targetOrg], 60_000);
   } catch {
-    // Session may have already expired -- that's ok
+    // The session may have already expired: that's ok.
   }
 }

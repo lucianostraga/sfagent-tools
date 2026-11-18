@@ -25,9 +25,8 @@ export async function sendMessage(args: z.infer<typeof sendMessageSchema>) {
   // Log to live transcript
   logUserMessage(args.message);
 
-  const { response, session: updatedSession } = await sendAgentMessage(
+  const { response, rendersUi, session: updatedSession } = await sendAgentMessage(
     session.orgAlias,
-    session.agentId,
     session,
     args.message
   );
@@ -45,6 +44,12 @@ export async function sendMessage(args: z.infer<typeof sendMessageSchema>) {
           {
             userMessage: args.message,
             agentResponse: response,
+            ...(rendersUi.length > 0 && {
+              rendersUi,
+              uiNote:
+                'The agent asked for input through a Custom Lightning Type editor. A real user sees a form here that a ' +
+                'headless session cannot render: test it in the browser with the agentforce-ui-test skill.',
+            }),
             sequenceId: updatedSession.sequenceId,
             totalMessagesInSession: updatedSession.messages.length,
           },

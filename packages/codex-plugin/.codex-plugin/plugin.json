@@ -1,6 +1,6 @@
 {
   "name": "sfagent-tools",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "AI-powered testing and evaluation for Salesforce Agentforce agents. Run headless conversations, validate behavior, and generate reports.",
   "author": {
     "name": "Luciano Straga",
@@ -24,7 +24,10 @@
     "longDescription": "Tell Codex what to test. It reads your Agentforce agent's brain, runs headless conversations, finds what's broken, and gives you a scored report with fix recommendations. Built on the Salesforce CLI and Agent API so authentication and traces stay native. Generates YAML specs compatible with `sf agent test run-eval` for CI hand-off.",
     "developerName": "Luciano Straga",
     "category": "Productivity",
-    "capabilities": ["Read", "Write"],
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
     "websiteURL": "https://github.com/lucianostraga/sfagent-tools",
     "defaultPrompt": [
       "Generate tests for my Agentforce agent",

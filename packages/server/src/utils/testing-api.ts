@@ -1,76 +1,113 @@
-import { execSync } from 'node:child_process';
-import { getSfProjectDir } from './sf-project.js';
-import type { BatchTestRun, TestResult } from '../types/index.js';
+import { runSfOk } from './sf.js';
+import type { BatchTestRun, RunState, ScorerResult, TestResult } from '../types/index.js';
 
-export async function runBatchTest(
-  targetOrg: string,
-  testApiName: string
-): Promise<BatchTestRun> {
-  try {
-    const result = execSync(
-      `sf agent test run --api-name "${testApiName}" --target-org "${targetOrg}" --wait 10 --result-format json --json`,
-      { encoding: 'utf-8', timeout: 600000, cwd: getSfProjectDir() }
-    );
+export type TestRunner = 'agentforce-studio' | 'testing-center';
 
-    const parsed = JSON.parse(result) as {
-      status: number;
-      result: {
-        jobId?: string;
-        status?: string;
-        runId?: string;
-      };
-    };
-
-    return {
-      runId: parsed.result.jobId ?? parsed.result.runId ?? '',
-      status: parsed.result.status ?? 'Unknown',
-      testName: testApiName,
-    };
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    throw new Error(`Failed to run batch test "${testApiName}": ${message}`);
+// Testing Center (legacy): NEW, IN_PROGRESS, COMPLETED, ERROR. Agentforce Studio: CREATED, IN_PROGRESS, SUCCESS,
+// FAILED. Both: TERMINATED.
+export function normalizeRunState(status: string | undefined): RunState {
+  switch ((status ?? '').toUpperCase()) {
+    case 'NEW':
+    case 'CREATED':
+    case 'IN_PROGRESS':
+      return 'running';
+    case 'COMPLETED':
+    case 'SUCCESS':
+      return 'completed';
+    case 'ERROR':
+    case 'FAILED':
+      return 'failed';
+    case 'TERMINATED':
+      return 'terminated';
+    default:
+      return 'unknown';
   }
 }
 
-// Salesforce renamed "topic" → "subagent" in Agent Script v2.0 (Apr 2026).
-// The Testing API still returns the legacy field names on older API versions,
-// so we read both shapes and normalize to the new names.
-export async function getTestResults(
-  targetOrg: string,
-  jobId: string
-): Promise<TestResult[]> {
+export async function runBatchTest(targetOrg: string, testApiName: string, testRunner?: TestRunner): Promise<BatchTestRun> {
+  const args = ['agent', 'test', 'run', '--api-name', testApiName, '--target-org', targetOrg, '--wait', '20'];
+  // Without a runner the CLI looks the name up in both formats; pass it when the caller knows it.
+  if (testRunner) args.push('--test-runner', testRunner);
+  const result = await runSfOk<{ jobId?: string; runId?: string; status?: string }>(args, 25 * 60_000);
+  const status = result.status ?? 'UNKNOWN';
+  return { runId: result.jobId ?? result.runId ?? '', status, state: normalizeRunState(status), testName: testApiName };
+}
+
+interface LegacyTestCase {
+  name?: string;
+  utterance?: string;
+  expectedSubagent?: string;
+  actualSubagent?: string;
+  subagentMatch?: boolean;
+  expectedTopic?: string;
+  actualTopic?: string;
+  topicMatch?: boolean;
+  expectedActions?: string[];
+  actualActions?: string[];
+  actionsMatch?: boolean;
+  expectedOutcome?: string;
+  actualOutcome?: string;
+  outcomeMatch?: boolean;
+  result?: string;
+}
+
+interface StudioTestCase {
+  testNumber?: number;
+  inputs?: { utterance?: string };
+  subjectResponse?: string;
+  testScorerResults?: Array<{ scorerName?: string; scorerResponse?: string }>;
+}
+
+// Agentforce Studio scorers answer with a JSON string. Comparison scorers carry actualValue/expectedValue;
+// grading scorers (LLM ratings, latency) carry a score or result instead.
+export function parseScorer(name: string, response: string | undefined): ScorerResult {
+  let data: Record<string, unknown> = {};
   try {
-    const result = execSync(
-      `sf agent test results --job-id "${jobId}" --target-org "${targetOrg}" --result-format json --json`,
-      { encoding: 'utf-8', timeout: 120000, cwd: getSfProjectDir() }
-    );
+    data = response ? (JSON.parse(response) as Record<string, unknown>) : {};
+  } catch {
+    return { name, raw: response };
+  }
+  const expected = data.expectedValue !== undefined ? String(data.expectedValue) : undefined;
+  const actual = data.actualValue !== undefined ? String(data.actualValue) : undefined;
+  let passed: boolean | undefined;
+  if (typeof data.result === 'string') passed = data.result.toUpperCase() === 'PASS';
+  else if (expected !== undefined && actual !== undefined) passed = expected.trim() === actual.trim();
+  return { name, expected, actual, raw: response, passed };
+}
 
-    const parsed = JSON.parse(result) as {
-      status: number;
-      result: {
-        testCases?: Array<{
-          name?: string;
-          utterance?: string;
-          expectedSubagent?: string;
-          actualSubagent?: string;
-          subagentMatch?: boolean;
-          expectedTopic?: string;
-          actualTopic?: string;
-          topicMatch?: boolean;
-          expectedActions?: string[];
-          actualActions?: string[];
-          actionsMatch?: boolean;
-          expectedOutcome?: string;
-          actualOutcome?: string;
-          outcomeMatch?: boolean;
-          result?: string;
-        }>;
+function utteranceFrom(tc: StudioTestCase): string {
+  if (tc.inputs?.utterance) return tc.inputs.utterance;
+  try {
+    const subject = JSON.parse(tc.subjectResponse ?? '{}') as { userInput?: string };
+    return subject.userInput ?? '';
+  } catch {
+    return '';
+  }
+}
+
+export function parseTestResults(result: { testCases?: Array<LegacyTestCase & StudioTestCase> }): TestResult[] {
+  return (result.testCases ?? []).map((tc) => {
+    if (tc.testScorerResults) {
+      const scorers = tc.testScorerResults.map((s) => parseScorer(s.scorerName ?? 'unknown', s.scorerResponse));
+      const routing = scorers.find((s) => /subagent|topic/i.test(s.name));
+      const verdicts = scorers.map((s) => s.passed).filter((p): p is boolean => p !== undefined);
+      return {
+        testCaseName: `test ${tc.testNumber ?? ''}`.trim(),
+        utterance: utteranceFrom(tc),
+        expectedSubagent: routing?.expected ?? '',
+        actualSubagent: routing?.actual ?? '',
+        subagentMatch: routing?.passed ?? false,
+        expectedActions: [],
+        actualActions: [],
+        actionsMatch: false,
+        expectedOutcome: '',
+        actualOutcome: '',
+        outcomeMatch: false,
+        scorers,
+        overallResult: verdicts.length === 0 ? 'unknown' : verdicts.every(Boolean) ? 'pass' : 'fail',
       };
-    };
-
-    const testCases = parsed.result.testCases ?? [];
-
-    return testCases.map((tc) => ({
+    }
+    return {
       testCaseName: tc.name ?? '',
       utterance: tc.utterance ?? '',
       expectedSubagent: tc.expectedSubagent ?? tc.expectedTopic ?? '',
@@ -82,28 +119,21 @@ export async function getTestResults(
       expectedOutcome: tc.expectedOutcome ?? '',
       actualOutcome: tc.actualOutcome ?? '',
       outcomeMatch: tc.outcomeMatch ?? false,
-      overallResult: tc.result === 'PASS' ? 'pass' : 'fail',
-    }));
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    throw new Error(`Failed to get test results for job "${jobId}": ${message}`);
-  }
+      scorers: [],
+      overallResult: tc.result === 'PASS' ? 'pass' : tc.result ? 'fail' : 'unknown',
+    };
+  });
+}
+
+export async function getTestResults(targetOrg: string, jobId: string, testRunner?: TestRunner): Promise<TestResult[]> {
+  const args = ['agent', 'test', 'results', '--job-id', jobId, '--target-org', targetOrg, '--verbose'];
+  if (testRunner) args.push('--test-runner', testRunner);
+  const result = await runSfOk<{ testCases?: Array<LegacyTestCase & StudioTestCase> }>(args, 5 * 60_000);
+  return parseTestResults(result);
 }
 
 export async function listTests(targetOrg: string): Promise<string[]> {
-  try {
-    const result = execSync(
-      `sf agent test list --target-org "${targetOrg}" --json`,
-      { encoding: 'utf-8', timeout: 30000, cwd: getSfProjectDir() }
-    );
-
-    const parsed = JSON.parse(result) as {
-      result: Array<{ name?: string; apiName?: string }>;
-    };
-
-    return parsed.result.map((t) => t.apiName ?? t.name ?? '');
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    throw new Error(`Failed to list tests: ${message}`);
-  }
+  const result = await runSfOk<Array<{ name?: string; apiName?: string; fullName?: string }>>(
+    ['agent', 'test', 'list', '--target-org', targetOrg], 60_000);
+  return result.map((t) => t.apiName ?? t.fullName ?? t.name ?? '');
 }

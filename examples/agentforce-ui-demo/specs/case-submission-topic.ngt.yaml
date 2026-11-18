@@ -1,0 +1,11 @@
+# Same scenario, structural scorer only (no LLM grading).
+name: Case_Submission_Topic
+description: The agent routes a case request to case_submission
+subjectType: AGENT
+subjectName: CustomLightningTypes
+testCases:
+  - inputs:
+      - utterance: I need to submit a support case
+    scorers:
+      - name: topic_sequence_match
+        expected: case_submission

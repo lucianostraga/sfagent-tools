@@ -11,6 +11,18 @@ export const startSessionSchema = z.object({
   targetOrg: z.string().describe('Org alias or username'),
   agentApiName: z.string().describe('API name of the agent (from list_agents, e.g. "Agentforce_Service_Agent")'),
   scenarioName: z.string().optional().describe('Optional: name of the test scenario (for live transcript logging)'),
+  authoringBundle: z
+    .boolean()
+    .optional()
+    .describe('Optional: preview the local authoring bundle (Agent Script) instead of the published agent'),
+  liveActions: z
+    .boolean()
+    .optional()
+    .describe('Optional, authoring bundles only: run real Apex/Flows/prompts instead of simulating them. They can change org data.'),
+  contextVariables: z
+    .array(z.object({ name: z.string(), type: z.string(), value: z.union([z.string(), z.number(), z.boolean()]) }))
+    .optional()
+    .describe('Optional: typed context variables, e.g. [{"name":"$Context.EndUserLanguage","type":"Text","value":"en_US"}]'),
 });
 
 export const endSessionSchema = z.object({
@@ -26,7 +38,7 @@ export async function startSession(args: z.infer<typeof startSessionSchema>) {
       content: [
         {
           type: 'text' as const,
-          text: '⚠️ BLOCKED: Refusing to start a test session against a PRODUCTION org. Use a sandbox or scratch org.',
+          text: '⚠️ BLOCKED: Refusing to start a test session against a production org (or one whose type could not be verified). Use a sandbox, scratch org or Developer Edition.',
         },
       ],
     };
@@ -43,7 +55,11 @@ export async function startSession(args: z.infer<typeof startSessionSchema>) {
     logScenarioStart(args.scenarioName);
   }
 
-  const session = await createSession(args.targetOrg, args.agentApiName);
+  const session = await createSession(args.targetOrg, args.agentApiName, {
+    authoringBundle: args.authoringBundle,
+    liveActions: args.liveActions,
+    contextVariables: args.contextVariables,
+  });
   activeSessions.set(session.sessionId, session);
 
   return {
@@ -81,7 +97,7 @@ export async function endSession(args: z.infer<typeof endSessionSchema>) {
     };
   }
 
-  await endAgentSession(session.orgAlias, args.sessionId);
+  await endAgentSession(session.orgAlias, session);
 
   // Log scenario result if provided
   if (args.scenarioResult) {

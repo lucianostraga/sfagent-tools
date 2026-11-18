@@ -1,8 +1,8 @@
 {
   "name": "sfagent-tools",
   "displayName": "SFAgent Tools",
-  "version": "1.0.0",
-  "description": "AI-powered testing and evaluation for Salesforce Agentforce agents. Run headless conversations, validate behavior, and generate reports.",
+  "version": "2.0.0",
+  "description": "Test Salesforce Agentforce agents from prompt to pixel: native agent tests for what the agent decides, Playwright for the forms and cards it renders.",
   "author": {
     "name": "Luciano Straga",
     "url": "https://github.com/lucianostraga"
@@ -11,10 +11,13 @@
   "repository": "https://github.com/lucianostraga/sfagent-tools",
   "license": "Apache-2.0",
   "keywords": [
-    "salesforce",
-    "agentforce",
-    "testing",
     "agent-testing",
-    "mcp"
+    "agentforce",
+    "custom-lightning-types",
+    "mcp",
+    "playwright",
+    "salesforce",
+    "testing",
+    "ui-testing"
   ]
 }

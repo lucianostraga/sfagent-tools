@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import { execSync } from 'node:child_process';
 import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { getSfProjectDir } from '../utils/sf-project.js';
+import { runSf } from '../utils/sf.js';
 
 // Wraps `sf agent trace list` and `sf agent trace read`, shipped in the
 // Salesforce CLI on 2026-05-20. Trace files are auto-recorded LOCALLY for
@@ -52,18 +52,15 @@ export const readTraceSchema = z.object({
 
 export async function listTraces(args: z.infer<typeof listTracesSchema>) {
   const flags: string[] = [];
-  if (args.agentApiName) flags.push(`--agent "${args.agentApiName}"`);
-  if (args.sessionId) flags.push(`--session-id "${args.sessionId}"`);
-  if (args.since) flags.push(`--since "${args.since}"`);
+  if (args.agentApiName) flags.push('--agent', args.agentApiName);
+  if (args.sessionId) flags.push('--session-id', args.sessionId);
+  if (args.since) flags.push('--since', args.since);
 
   try {
-    const stdout = execSync(`sf agent trace list ${flags.join(' ')} --json`, {
-      encoding: 'utf-8',
-      timeout: 30000,
-      cwd: getSfProjectDir(),
-    });
+    const out = await runSf(['agent', 'trace', 'list', ...flags], 30_000);
+    if (out.status !== 0) throw new Error(out.message ?? 'sf agent trace list failed');
     return {
-      content: [{ type: 'text' as const, text: stdout }],
+      content: [{ type: 'text' as const, text: JSON.stringify(out.result, null, 2) }],
     };
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
@@ -95,20 +92,17 @@ function findTraceFilesForSession(sessionId: string): string[] {
 }
 
 export async function readTrace(args: z.infer<typeof readTraceSchema>) {
-  const flags: string[] = [`--session-id "${args.sessionId}"`];
-  if (args.format) flags.push(`--format ${args.format}`);
-  if (args.dimension) flags.push(`--dimension ${args.dimension}`);
-  if (args.turn !== undefined) flags.push(`--turn ${args.turn}`);
+  const flags: string[] = ['--session-id', args.sessionId];
+  if (args.format) flags.push('--format', args.format);
+  if (args.dimension) flags.push('--dimension', args.dimension);
+  if (args.turn !== undefined) flags.push('--turn', String(args.turn));
 
   // 1. Try sf CLI first
   try {
-    const stdout = execSync(`sf agent trace read ${flags.join(' ')} --json`, {
-      encoding: 'utf-8',
-      timeout: 30000,
-      cwd: getSfProjectDir(),
-    });
+    const out = await runSf(['agent', 'trace', 'read', ...flags], 30_000);
+    if (out.status !== 0) throw new Error(out.message ?? 'sf agent trace read failed');
     return {
-      content: [{ type: 'text' as const, text: stdout }],
+      content: [{ type: 'text' as const, text: JSON.stringify(out.result, null, 2) }],
     };
   } catch {
     // sf CLI failed (typically TraceParseError on empty files).

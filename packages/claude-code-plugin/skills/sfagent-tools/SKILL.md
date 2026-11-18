@@ -27,8 +27,8 @@ You have access to MCP tools for testing Salesforce Agentforce agents through he
 - `read_trace` — Read the step-by-step trace for a specific session (actions, subagent routing, tool calls)
 
 **Regression hand-off**
-- `generate_test_spec` — Convert the active session's transcript into a YAML spec for `sf agent test run-eval`
-- `run_batch_test` — Execute an AiEvaluationDefinition test suite
+- `generate_test_spec` — Convert the active session's transcript into a native test spec (Agentforce Studio format by default; `format: run-eval` for the older Beta YAML)
+- `run_batch_test` — Run a native test: an AiTestingDefinition (Agentforce Studio) or a legacy AiEvaluationDefinition (pass `testRunner` when you know it)
 - `get_test_results` — Fetch results of a batch test run
 
 ## Autonomous Test Generation (Primary Feature)
@@ -101,14 +101,22 @@ Overall score = weighted average (routing 25%, guardrails 25%, quality 15%, mult
 ### Step 6: Output
 Generate:
 1. Markdown report in `sfagent-reports/` directory
-2. YAML test specs for `sf agent test run-eval` (use `generate_test_spec`) in `sfagent-reports/generated-specs/`
+2. Native test specs (use `generate_test_spec`) in `sfagent-reports/generated-specs/`
 
-The generated YAML can be run by Salesforce directly:
+Create and run them with Salesforce's own tooling:
 ```
-sf agent test run-eval --spec sfagent-reports/generated-specs/<suite>.yaml --target-org <alias>
+sf agent test create --spec sfagent-reports/generated-specs/<suite>.yaml --api-name <Name> --test-runner agentforce-studio
+sf agent test run --api-name <Name> --wait 20 --json
 ```
 
 This is the recommended hand-off path: explore here, regress in CI with native tooling.
+
+### When the agent renders UI
+
+If `send_message` returns `rendersUi`, the agent asked for input through a Custom Lightning Type form, and actions with
+displayable CLT outputs show cards. A headless session and native tests cannot see them. Use the
+`agentforce-ui-test` skill to test those forms and cards in the Agentforce panel with Playwright, with the same
+utterances.
 
 ## Manual Testing Workflow
 

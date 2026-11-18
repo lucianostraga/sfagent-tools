@@ -16,10 +16,25 @@ export interface AgentInfo {
   status: string;
 }
 
+export interface ContextVariable {
+  name: string;
+  type: string;
+  value: string | number | boolean;
+}
+
+export interface SessionOptions {
+  // Run a local authoring bundle instead of the published agent.
+  authoringBundle?: boolean;
+  // Only for authoring bundles: run real Apex, Flows and prompts instead of simulating them.
+  liveActions?: boolean;
+  contextVariables?: ContextVariable[];
+}
+
 export interface AgentSession {
   sessionId: string;
   agentId: string;
   orgAlias: string;
+  authoringBundle: boolean;
   sequenceId: number;
   messages: ConversationMessage[];
 }
@@ -36,16 +51,29 @@ export interface SSEEvent {
   data: string;
 }
 
+// Run states differ by runner: Testing Center (legacy) uses NEW/IN_PROGRESS/COMPLETED/ERROR, Agentforce Studio
+// uses CREATED/IN_PROGRESS/SUCCESS/FAILED. Both have TERMINATED.
+export type RunState = 'running' | 'completed' | 'failed' | 'terminated' | 'unknown';
+
 export interface BatchTestRun {
   runId: string;
   status: string;
+  state: RunState;
   testName: string;
 }
 
-// "Subagent" is the Agent Script v2.0 term (renamed from "topic" in April 2026,
-// per https://github.com/forcedotcom/cli/blob/main/releasenotes/README.md).
-// The Testing API still returns the old field names on older API versions, so
-// the parser accepts both shapes — see utils/testing-api.ts.
+export interface ScorerResult {
+  name: string;
+  expected?: string;
+  actual?: string;
+  // Raw scorer output, for scorers that grade rather than compare (LLM ratings, latency).
+  raw?: string;
+  passed?: boolean;
+}
+
+// "Subagent" is the Agent Script v2.0 term (renamed from "topic" in April 2026).
+// Legacy (AiEvaluationDefinition) results come as expected/actual pairs; Agentforce Studio (AiTestingDefinition)
+// results come as scorers. Both are normalized here.
 export interface TestResult {
   testCaseName: string;
   utterance: string;
@@ -58,5 +86,6 @@ export interface TestResult {
   expectedOutcome: string;
   actualOutcome: string;
   outcomeMatch: boolean;
-  overallResult: 'pass' | 'fail';
+  scorers: ScorerResult[];
+  overallResult: 'pass' | 'fail' | 'unknown';
 }

@@ -30,12 +30,23 @@ export async function getOrgConnection(aliasOrUsername: string) {
   };
 }
 
-export async function isProductionOrg(aliasOrUsername: string): Promise<boolean> {
-  const authorizations = await AuthInfo.listAllAuthorizations();
-  const match = authorizations.find(
-    (auth) => auth.username === aliasOrUsername || auth.aliases?.includes(aliasOrUsername)
-  );
+// Blocks production. Asks the org itself instead of trusting local auth metadata, and fails closed: if the org
+// type cannot be verified, it is treated as production. Allowed: sandboxes (scratch orgs report IsSandbox = true)
+// and Developer Edition orgs.
+export function isProductionOrgType(record: { IsSandbox?: boolean; OrganizationType?: string } | undefined): boolean {
+  if (!record) return true;
+  if (record.IsSandbox === true) return false;
+  return record.OrganizationType !== 'Developer Edition';
+}
 
-  if (!match) return false;
-  return !match.isSandbox && !match.isScratchOrg;
+export async function isProductionOrg(aliasOrUsername: string): Promise<boolean> {
+  try {
+    const org = await Org.create({ aliasOrUsername });
+    const result = await org
+      .getConnection()
+      .query<{ IsSandbox: boolean; OrganizationType: string }>('SELECT IsSandbox, OrganizationType FROM Organization');
+    return isProductionOrgType(result.records[0]);
+  } catch {
+    return true;
+  }
 }

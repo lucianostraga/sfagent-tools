@@ -1,10 +1,17 @@
 # SFAgent Tools
 
-> **Test Agentforce agents from prompt to pixel, with Claude Code and Playwright.**
->
-> Salesforce's native tests check what your agent **decides**: the subagent, the actions, the answer. SFAgent Tools adds
-> what they can't see: the **forms and cards your agent renders** for the user. Claude Code explores the agent, writes
-> both kinds of tests, runs them and tells you which layer broke.
+**Test Agentforce agents from prompt to pixel, with Claude Code and Playwright.**
+
+![Playwright drives the Agentforce panel: the agent asks for the case details with a form, Playwright fills it in and submits it, and the agent answers with a card that shows the new case. After a change breaks the card, the native test still passes and the Playwright test fails.](demo/prompt-to-pixel.gif)
+
+<table>
+<tr>
+<td width="50%"><b>Claude Code writes both tests</b><br><img src="demo/claude-code-skill.gif" alt="A Claude Code session: it loads the agentforce-ui-test skill, writes a Playwright test and a native test spec, runs both and reports that both pass."></td>
+<td width="50%"><b>…and finds the layer that broke</b><br><img src="demo/claude-code-broken-card.gif" alt="After a one-line change to the card, Claude Code runs both layers: the native test passes, the Playwright test fails at the case number, and Claude explains the cause."></td>
+</tr>
+</table>
+
+<sub>Real runs in a scratch org, replayed. [Full walkthrough video (MP4, 85 s)](demo/prompt-to-pixel.mp4)</sub>
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![npm](https://img.shields.io/npm/v/sfagent-tools-mcp-server.svg)](https://www.npmjs.com/package/sfagent-tools-mcp-server)
@@ -14,12 +21,6 @@
 [![Works in Agentforce Vibes](https://img.shields.io/badge/Agentforce_Vibes-supported-00A1E0.svg)](https://developer.salesforce.com/docs/platform/einstein-for-devs/guide/devagent-mcp.html)
 
 ---
-
-![Playwright drives the Agentforce panel: the agent asks for the case details with a form, Playwright fills it in and submits it, and the agent answers with a card that shows the new case. After a change breaks the card, the native test still passes and the Playwright test fails.](demo/prompt-to-pixel.gif)
-
-<sub>Recorded headless with Playwright in the example's scratch org. The agent asks with a form, Playwright fills it in,
-the agent answers with a card. Then a change breaks the card: the native test still passes, Playwright fails.
-[Full video, 85 s (MP4)](demo/prompt-to-pixel.mp4)</sub>
 
 ## Two layers, one scenario
 
@@ -31,23 +32,12 @@ the agent answers with a card. Then a change breaks the card: the native test st
 Native tests run in a channel that reports `__supports_result_display__: false`: they never render the UI. Break the
 card your agent shows and the native test still passes. The Playwright test catches it.
 
-![A teammate's commit makes the card read value.number instead of value.caseNumber. Claude Code runs both layers: the native test passes, the Playwright test fails at the case number, and Claude explains the cause and why only one layer could catch it.](demo/claude-code-broken-card.gif)
-
-<sub>A real Claude Code session after a one-line change to the card. Prompt: *"A teammate changed the case card. Run
-both test layers and tell me which one broke and why. Don't change anything yet."* 9 turns, about 3.5 minutes (most of
-it Playwright waiting for the case number). Replayed from its transcript.</sub>
-
 ## Try it
 
 [`examples/agentforce-ui-demo`](examples/agentforce-ui-demo) has everything: a script that creates a scratch org, an
 employee agent whose action shows a form and a result card, a native test and a Playwright test. Then ask Claude Code:
 
 > *"Test what my agent shows users, end to end, and pair it with a native test."*
-
-![A Claude Code session: it loads the agentforce-ui-test skill, checks the org, writes a Playwright test and a native test spec, runs both and reports that both pass.](demo/claude-code-skill.gif)
-
-<sub>A real Claude Code session with that prompt, in a copy of the example without tests: 18 turns, 73 seconds, both
-tests written from scratch and passing. Replayed from its transcript.</sub>
 
 ## What's new in 2.0
 

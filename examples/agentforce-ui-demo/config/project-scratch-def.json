@@ -1,0 +1,49 @@
+{
+    "orgName": "sfagent-tools Agentforce UI demo",
+    "edition": "Developer",
+    "hasSampleData": false,
+    "features": [
+        "Communities",
+        "ServiceCloud",
+        "LiveAgent",
+        "LiveMessage",
+        "Sites",
+        "FlowSites",
+        "Einstein1AIPlatform",
+        "EnableSetPasswordInApi"
+    ],
+    "settings": {
+        "communitiesSettings": {
+            "enableNetworksEnabled": true
+        },
+        "experienceBundleSettings": {
+            "enableExperienceBundleMetadata": true
+        },
+        "lightningExperienceSettings": {
+            "enableS1DesktopEnabled": true
+        },
+        "liveAgentSettings": {
+            "enableLiveAgent": true
+        },
+        "liveMessageSettings": {
+            "enableLiveMessage": true
+        },
+        "mobileSettings": {
+            "enableS1EncryptedStoragePref2": false
+        },
+        "omniChannelSettings": {
+            "enableOmniChannel": true
+        },
+        "userEngagementSettings": {
+            "enableShowSalesforceUserAssist": false
+        },
+        "EinsteinGptSettings": {
+            "enableEinsteinGptPlatform": true
+        },
+        "agentPlatformSettings": {
+            "enableAgentPlatform": true
+        }
+    },
+    "language": "en_US",
+    "country": "US"
+}

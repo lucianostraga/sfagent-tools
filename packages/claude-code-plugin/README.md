@@ -8,6 +8,9 @@ Tell Claude what to test. It reads your agent's brain, has dozens of conversatio
 
 *Real terminal recording. No mocks, no edits.*
 
+**New in 2.0:** Playwright tests for the forms and cards your agent renders in the Agentforce panel, paired with
+native tests (the `agentforce-ui-test` skill). See the [main README](../../README.md).
+
 ```
 "Generate tests for my Agentforce agent"
 ```

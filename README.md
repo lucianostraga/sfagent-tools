@@ -15,6 +15,12 @@
 
 ---
 
+![Playwright drives the Agentforce panel: the agent asks for the case details with a form, Playwright fills it in and submits it, and the agent answers with a card that shows the new case. After a change breaks the card, the native test still passes and the Playwright test fails.](demo/prompt-to-pixel.gif)
+
+<sub>Recorded headless with Playwright in the example's scratch org. The agent asks with a form, Playwright fills it in,
+the agent answers with a card. Then a change breaks the card: the native test still passes, Playwright fails.
+[Full video, 85 s (MP4)](demo/prompt-to-pixel.mp4)</sub>
+
 ## Two layers, one scenario
 
 | Layer | What it checks | How |
@@ -25,12 +31,23 @@
 Native tests run in a channel that reports `__supports_result_display__: false`: they never render the UI. Break the
 card your agent shows and the native test still passes. The Playwright test catches it.
 
+![A teammate's commit makes the card read value.number instead of value.caseNumber. Claude Code runs both layers: the native test passes, the Playwright test fails at the case number, and Claude explains the cause and why only one layer could catch it.](demo/claude-code-broken-card.gif)
+
+<sub>A real Claude Code session after a one-line change to the card. Prompt: *"A teammate changed the case card. Run
+both test layers and tell me which one broke and why. Don't change anything yet."* 9 turns, about 3.5 minutes (most of
+it Playwright waiting for the case number). Replayed from its transcript.</sub>
+
 ## Try it
 
 [`examples/agentforce-ui-demo`](examples/agentforce-ui-demo) has everything: a script that creates a scratch org, an
 employee agent whose action shows a form and a result card, a native test and a Playwright test. Then ask Claude Code:
 
 > *"Test what my agent shows users, end to end, and pair it with a native test."*
+
+![A Claude Code session: it loads the agentforce-ui-test skill, checks the org, writes a Playwright test and a native test spec, runs both and reports that both pass.](demo/claude-code-skill.gif)
+
+<sub>A real Claude Code session with that prompt, in a copy of the example without tests: 18 turns, 73 seconds, both
+tests written from scratch and passing. Replayed from its transcript.</sub>
 
 ## What's new in 2.0
 
@@ -97,7 +114,8 @@ And your AI does the rest.
 
 ## Every tool, in 10 seconds each
 
-Each clip is a real terminal recording. Real Salesforce sandbox. Real Agentforce Service Agent.
+Each clip replays a real Claude Code run. Most are from 1.0 (May 2026), against a sandbox and the Agentforce Service
+Agent; `send_message` and `generate_test_spec` were recorded again for 2.0, against the example's scratch org.
 
 ### Discover what's in your org
 
@@ -113,14 +131,14 @@ Each clip is a real terminal recording. Real Salesforce sandbox. Real Agentforce
 | | |
 |---|---|
 | **start_session** — open a headless conversation | ![](demo/clips/sfagent-start_session.gif) |
-| **send_message** — send a probe, get the agent's reply | ![](demo/clips/sfagent-send_message.gif) |
+| **send_message** — send a probe, get the agent's reply, and a flag when the agent asks with a form | ![](demo/clips/sfagent-send_message.gif) |
 | **end_session** — close and return the transcript | ![](demo/clips/sfagent-end_session.gif) |
 
 ### Hand off to CI
 
 | | |
 |---|---|
-| **generate_test_spec** — emit YAML for `sf agent test run-eval` | ![](demo/clips/sfagent-generate_test_spec.gif) |
+| **generate_test_spec** — turn the conversation into a native test spec (Agentforce Studio by default) | ![](demo/clips/sfagent-generate_test_spec.gif) |
 
 ### Diagnose with Salesforce's own traces *(sf CLI 2026-05-20+)*
 
@@ -129,7 +147,8 @@ Each clip is a real terminal recording. Real Salesforce sandbox. Real Agentforce
 | **list_traces** — find local trace files | ![](demo/clips/sfagent-list_traces.gif) |
 | **read_trace** — drill into actions + routing per turn | ![](demo/clips/sfagent-read_trace.gif) |
 
-Plus `run_batch_test` and `get_test_results` for users who already have native `AiEvaluationDefinition` tests in their org.
+Plus `run_batch_test` and `get_test_results`, which run native tests (Agentforce Studio or Testing Center) and read
+their scorer results.
 
 ---
 
@@ -173,7 +192,7 @@ For the full Codex plugin experience (skills + marketplace metadata), see [packa
 
 ## Status
 
-- **2.0.0** (this branch): the Playwright UI layer, Agentforce Studio tests, safer CLI calls and server tests. Verified
+- **2.0.0**: the Playwright UI layer, Agentforce Studio tests, safer CLI calls and server tests. Verified
   end to end against a scratch org on November 18, 2026: Claude Code, starting from a project with no tests, wrote a
   Playwright test and a native test for the same scenario and both passed.
 - **1.0.0** (May 2026): headless conversations, traces and run-eval specs, in Claude Code and Codex.

@@ -105,13 +105,17 @@ testCases:
 
 `sf agent test create --spec <file> --api-name <Test_Name> --test-runner agentforce-studio`, then
 `sf agent test run --api-name <Test_Name> --wait 20 --json` (with `--result-format json` the progress animation
-gets mixed into the output). Report both results together:
+gets mixed into the output). The run's `status` (`COMPLETED`, `SUCCESS`) only says the run finished. The verdict is
+in each `testScorerResults[].scorerResponse`, a JSON string: a structural scorer such as `topic_sequence_match`
+answers with `expectedValue` and `actualValue` and no pass field, and it passes when the two are equal. The MCP tool
+`get_test_results` reads it that way. Report both results together:
 "native: routed to `<subagent>`; UI: form and card verified" (or which layer failed).
 
 ## Known issues (Salesforce CLI 2.158, Playwright 1.64)
 
-- `sf agent test run --result-format junit` can write "Unknown error" for passing `agentforce-studio` tests; read
-  `--json` instead (`testScorerResults[].scorerResponse`).
+- `sf agent test run --result-format junit` can write "Unknown error" for passing `agentforce-studio` tests, and
+  `--result-format human` can list a structural scorer as "Fail" with the same expected and actual value (and count
+  the test as failing). Read `--json` instead (`testScorerResults[].scorerResponse`).
 - A native test spec without `description` fails with "Required fields are missing: [MasterLabel]".
 - Right after creating a scratch org, `sf agent publish authoring-bundle` can fail with `fetch failed` for a few
   minutes while the agent API learns about the org; retry.
